@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sci-Fi Cyber Lab: VR Escape Room</title>
+  <title>Cyber Lab: Advanced VR Escape Room</title>
   <!-- A-Frame Library -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <style>
@@ -19,12 +19,12 @@
       top: 15px;
       left: 15px;
       z-index: 9999;
-      background: rgba(10, 15, 30, 0.85);
+      background: rgba(10, 15, 30, 0.9);
       border: 2px solid #00f3ff;
       border-radius: 10px;
       padding: 15px 20px;
       color: #ffffff;
-      width: 320px;
+      width: 340px;
       box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
       pointer-events: none;
     }
@@ -125,7 +125,7 @@
       font-weight: bold;
     }
 
-    /* Win Overlay Screen */
+    /* Win Screen Overlay */
     #win-screen {
       display: none;
       position: fixed;
@@ -162,11 +162,12 @@
   <!-- UI Overlay: HUD -->
   <div id="hud">
     <h2>Mission Objective</h2>
-    <div id="objective">1. Locate the Plasma Energy Core on the table.</div>
+    <div id="objective">1. Locate the Security Keycard on the main lab desk.</div>
     <div class="status-box">
-      <div class="status-item">Energy Core Held: <span id="st-core" class="inactive">NO</span></div>
-      <div class="status-item">Pedestal Powered: <span id="st-power" class="inactive">NO</span></div>
-      <div class="status-item">Terminal Unlocked: <span id="st-door" class="inactive">LOCKED</span></div>
+      <div class="status-item">Security Keycard: <span id="st-keycard" class="inactive">NO</span></div>
+      <div class="status-item">Storage Locker: <span id="st-locker" class="inactive">LOCKED</span></div>
+      <div class="status-item">UV Flashlight: <span id="st-light" class="inactive">NO</span></div>
+      <div class="status-item">Exit Door: <span id="st-door" class="inactive">LOCKED</span></div>
     </div>
   </div>
 
@@ -180,57 +181,39 @@
       <h1>One-Page Game Summary</h1>
       
       <h2>1. Game Overview</h2>
-      <p><strong>Game Name:</strong> Cyber Lab: Escape Strategy</p>
-      <p><strong>Theme:</strong> Futuristic Cyberpunk Research Facility</p>
-      <p><strong>Player Objective:</strong> Re-activate the room's auxiliary generator and bypass security terminal locks to open the escape door.</p>
+      <p><strong>Game Name:</strong> Cyber Lab: Advanced Escape</p>
+      <p><strong>Theme:</strong> High-Tech Cyberpunk Security Facility</p>
+      <p><strong>Player Objective:</strong> Collect the keycard, open the equipment locker, retrieve the UV flashlight, scan the wall for hidden ultraviolet codes, and input the code into the security terminal to escape.</p>
       <p><strong>Main Puzzles:</strong>
-        <br>• <em>Puzzle 1 (Power Connection):</em> Retrieve the misplaced Plasma Core and slot it into the Power Pedestal.
-        <br>• <em>Puzzle 2 (Code Entry):</em> Read the glowing encrypted passcode on the lab monitor wall (<code>3-7-9</code>) and enter it into the interactive wall terminal keypad.
+        <br>• <em>Puzzle 1 (Access Control):</em> Use the Keycard to unlock the Storage Locker.
+        <br>• <em>Puzzle 2 (Ultraviolet Scanning):</em> Use the UV Flashlight on the north lab wall to reveal encrypted code digits (<code>8-4-2</code>).
+        <br>• <em>Puzzle 3 (Terminal Input):</em> Enter the correct code sequence into the wall keypad to trigger the sliding exit doors.
       </p>
 
       <h2>2. Programming Techniques</h2>
-      <p>• <strong>Game State Management:</strong> Utilised global state variables (e.g., <code>hasCore</code>, <code>isPowered</code>, <code>enteredCode</code>) to strictly track player progression.</p>
-      <p>• <strong>Event-Driven Interactions:</strong> Applied A-Frame <code>click</code>, <code>mouseenter</code>, and <code>mouseleave</code> event listeners to handle user gaze/click interaction inside 3D space.</p>
-      <p>• <strong>Conditional Logic & Functions:</strong> Created helper validation functions like <code>checkCode()</code> using <code>if / else</code> conditions to verify keypad inputs and trigger door animations.</p>
-      
-      <h3>Code Example:</h3>
-      <pre><code>function handleKeyInput(num) {
-  if (!gameState.isPowered) {
-    updateHUD("Power Pedestal must be activated first!");
-    return;
-  }
-  gameState.enteredCode += num;
-  if (gameState.enteredCode.length === 3) {
-    if (gameState.enteredCode === gameState.targetCode) {
-      unlockDoor();
-    } else {
-      resetKeypad();
-    }
-  }
-}</code></pre>
+      <p>• <strong>Game State Tracking:</strong> Multiple boolean and counter variables (<code>hasKeycard</code>, <code>lockerOpen</code>, <code>hasFlashlight</code>, <code>uvActive</code>, <code>enteredCode</code>) manage player progression across dependent stages.</p>
+      <p>• <strong>Event Listeners & DOM API:</strong> Uses A-Frame click/mouseenter listeners combined with Web Audio API sound synthesis for responsive feedback.</p>
+      <p>• <strong>Conditional Logic:</strong> Nested `if / else if` statements validate player inventory before allowing interactions like opening lockers or entering passcodes.</p>
 
       <h2>3. User Experience (UX) Decisions</h2>
-      <p><strong>Visual & Audio Feedback:</strong> Dynamic hover effects (glowing/scaling elements when aimed at) and instant text updates on the HUD provide real-time guidance to eliminate player confusion.</p>
+      <p><strong>Visual Feedback:</strong> Interactive objects scale up on hover (`mouseenter`), change color on activation, and update real-time status items in the HUD.</p>
 
       <h2>4. Evaluation</h2>
-      <p><strong>What Worked Well:</strong> The seamless progression flow from item collection to power activation and final passcode entry.</p>
-      <p><strong>Future Improvement:</strong> Adding a timed countdown alarm with flashing red alert lights to increase player tension.</p>
+      <p><strong>What Worked Well:</strong> The multi-tiered puzzle chain ensures the player interacts with multiple objects across the 3D environment.</p>
+      <p><strong>Future Improvement:</strong> Adding movable physics objects or laser mirrors.</p>
     </div>
   </div>
 
   <!-- Win Screen Overlay -->
   <div id="win-screen">
-    <h1>LAB ESCAPED!</h1>
-    <p>You successfully restored auxiliary power and bypassed security locks.</p>
+    <h1>FACILITY ESCAPED!</h1>
+    <p>You successfully bypassed all security locks and exited the lab.</p>
     <button id="restart-btn" onclick="location.reload()">Play Again</button>
   </div>
 
   <!-- A-Frame 3D Scene -->
   <a-scene cursor="rayOrigin: mouse" raycaster="objects: .clickable">
-    <a-assets>
-      <!-- Synthetic Asset Colors/Gradients defined in components -->
-    </a-assets>
-
+    
     <!-- Camera & Cursor Setup -->
     <a-entity id="rig" position="0 0 3">
       <a-camera id="camera">
@@ -245,116 +228,94 @@
     </a-entity>
 
     <!-- Lighting -->
-    <a-ambient-light color="#111827" intensity="0.6"></a-ambient-light>
-    <a-point-light id="room-light" color="#00f3ff" position="0 4 0" intensity="0.8"></a-point-light>
-    <a-point-light id="pedestal-light" color="#ff0055" position="-3.5 2 -1" intensity="0.5"></a-point-light>
+    <a-ambient-light color="#111827" intensity="0.7"></a-ambient-light>
+    <a-point-light color="#00f3ff" position="0 4 0" intensity="0.9"></a-point-light>
 
     <!-- Room Structure (Enclosed Lab Interior) -->
-    <!-- Floor -->
-    <a-plane position="0 0 0" rotation="-90 0 0" width="10" height="10" color="#1e293b"></a-plane>
-    <!-- Ceiling -->
-    <a-plane position="0 5 0" rotation="90 0 0" width="10" height="10" color="#0f172a"></a-plane>
-    <!-- Back Wall (Door Side) -->
-    <a-plane position="0 2.5 -5" rotation="0 0 0" width="10" height="5" color="#0f172a"></a-plane>
-    <!-- Front Wall -->
-    <a-plane position="0 2.5 5" rotation="0 180 0" width="10" height="5" color="#0f172a"></a-plane>
-    <!-- Left Wall -->
-    <a-plane position="-5 2.5 0" rotation="0 90 0" width="10" height="5" color="#0f172a"></a-plane>
-    <!-- Right Wall -->
-    <a-plane position="5 2.5 0" rotation="0 -90 0" width="10" height="5" color="#0f172a"></a-plane>
+    <a-plane position="0 0 0" rotation="-90 0 0" width="12" height="12" color="#1e293b"></a-plane>
+    <a-plane position="0 6 0" rotation="90 0 0" width="12" height="12" color="#0f172a"></a-plane>
+    <a-plane position="0 3 -6" rotation="0 0 0" width="12" height="6" color="#0f172a"></a-plane>
+    <a-plane position="0 3 6" rotation="0 180 0" width="12" height="6" color="#0f172a"></a-plane>
+    <a-plane position="-6 3 0" rotation="0 90 0" width="12" height="6" color="#0f172a"></a-plane>
+    <a-plane position="6 3 0" rotation="0 -90 0" width="12" height="6" color="#0f172a"></a-plane>
 
     <!-- Wall Accent Decor Stripes -->
-    <a-box position="0 4.8 -4.9" width="9.8" height="0.1" depth="0.1" color="#00f3ff"></a-box>
-    <a-box position="-4.9 4.8 0" width="0.1" height="0.1" depth="9.8" color="#00f3ff"></a-box>
+    <a-box position="0 5.8 -5.9" width="11.8" height="0.1" depth="0.1" color="#00f3ff"></a-box>
 
-    <!-- ===== OBJECT 1: LAB WORKTABLE ===== -->
-    <a-box position="2 0.8 -2" width="2" height="0.1" depth="1.2" color="#334155"></a-box>
-    <a-cylinder position="1.1 0.4 -1.5" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
-    <a-cylinder position="2.9 0.4 -1.5" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
-    <a-cylinder position="1.1 0.4 -2.5" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
-    <a-cylinder position="2.9 0.4 -2.5" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
+    <!-- ===== OBJECT 1: CENTRAL LAB DESK ===== -->
+    <a-entity position="2 0 -2">
+      <a-box position="0 0.8 0" width="2.2" height="0.1" depth="1.2" color="#334155"></a-box>
+      <a-cylinder position="-0.9 0.4 -0.4" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
+      <a-cylinder position="0.9 0.4 -0.4" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
+      <a-cylinder position="-0.9 0.4 0.4" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
+      <a-cylinder position="0.9 0.4 0.4" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
 
-    <!-- ===== INTERACTIVE OBJECT A: PLASMA ENERGY CORE ===== -->
-    <a-octahedron 
-      id="plasma-core" 
-      class="clickable" 
-      position="2 1.15 -2" 
-      radius="0.25" 
-      color="#00f3ff" 
-      material="emissive: #00f3ff; emissiveIntensity: 0.8"
-      animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear">
-    </a-octahedron>
-
-    <!-- ===== OBJECT 2: POWER PEDESTAL ===== -->
-    <a-cylinder id="pedestal-base" position="-4.2 1 -1" radius="0.4" height="2" color="#1e293b">
-      <!-- Slot Receiver -->
-      <a-box id="pedestal-slot" class="clickable" position="0.35 0.5 0" width="0.2" height="0.5" depth="0.5" color="#334155">
-        <a-ring position="0.11 0 0" rotation="0 90 0" radius-inner="0.08" radius-outer="0.15" color="#ff0055" id="slot-ring"></a-ring>
-      </a-box>
-    </a-cylinder>
-
-    <!-- ===== PUZZLE HINT: MONITOR WALL ===== -->
-    <a-box position="4.9 2.5 0" width="0.1" height="1.8" depth="3" color="#1e293b">
-      <a-plane position="-0.06 0 0" rotation="0 -90 0" width="2.8" height="1.6" color="#0a0f1d">
-        <a-text value="SYSTEM LOGS:\n------------------\nAux Power Protocol:\nCode = [3] [7] [9]\n------------------" color="#00f3ff" position="-1.2 0.3 0" scale="0.5 0.5 0.5"></a-text>
-      </a-plane>
-    </a-box>
-
-    <!-- ===== OBJECT 3: SECURITY KEYPAD TERMINAL ===== -->
-    <a-entity id="keypad-panel" position="1.5 2 -4.9">
-      <a-box width="1.2" height="1.8" depth="0.1" color="#1e293b"></a-box>
-      <!-- Display Screen -->
-      <a-plane position="0 0.5 0.06" width="1" height="0.4" color="#000000">
-        <a-text id="keypad-display" value="LOCKED" color="#ff0055" align="center" position="0 0 0.01" scale="0.7 0.7 0.7"></a-text>
-      </a-plane>
-
-      <!-- Keypad Buttons (Grid Layout) -->
-      <!-- Row 1 -->
-      <a-box class="clickable btn-num" data-val="1" position="-0.3 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="1" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
-      </a-box>
-      <a-box class="clickable btn-num" data-val="2" position="0 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="2" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
-      </a-box>
-      <a-box class="clickable btn-num" data-val="3" position="0.3 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="3" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
-      </a-box>
-
-      <!-- Row 2 -->
-      <a-box class="clickable btn-num" data-val="4" position="-0.3 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="4" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
-      </a-box>
-      <a-box class="clickable btn-num" data-val="5" position="0 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="5" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
-      </a-box>
-      <a-box class="clickable btn-num" data-val="6" position="0.3 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="6" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
-      </a-box>
-
-      <!-- Row 3 -->
-      <a-box class="clickable btn-num" data-val="7" position="-0.3 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="7" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
-      </a-box>
-      <a-box class="clickable btn-num" data-val="8" position="0 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="8" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
-      </a-box>
-      <a-box class="clickable btn-num" data-val="9" position="0.3 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155">
-        <a-text value="9" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text>
+      <!-- INTERACTIVE OBJECT A: SECURITY KEYCARD -->
+      <a-box id="keycard" class="clickable" position="0 0.9 0" width="0.3" height="0.02" depth="0.2" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 0.5" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000">
+        <a-text value="KEYCARD" align="center" rotation="-90 0 0" position="0 0.02 0" scale="0.3 0.3 0.3" color="#ffffff"></a-text>
       </a-box>
     </a-entity>
 
-    <!-- ===== ESCAPE DOOR FRAME & DOORS ===== -->
-    <a-entity id="exit-door-group" position="-1 0 -4.85">
-      <!-- Frame -->
+    <!-- ===== OBJECT 2: STORAGE LOCKER ===== -->
+    <a-entity id="locker" position="-4.5 0 -2">
+      <!-- Locker Frame -->
+      <a-box position="0 1.5 0" width="1.2" height="3" depth="0.8" color="#1e293b"></a-box>
+      <!-- Locker Door (Left) -->
+      <a-box id="locker-door" class="clickable" position="-0.6 1.5 0.4" width="1.2" height="2.9" depth="0.08" color="#334155" rotation="0 0 0" pivot="-0.6 0 0">
+        <a-text id="locker-status" value="LOCKED" align="center" position="0 0 0.05" scale="0.6 0.6 0.6" color="#ff3366"></a-text>
+      </a-box>
+
+      <!-- OBJECT INSIDE LOCKER: UV FLASHLIGHT -->
+      <a-cylinder id="flashlight" class="clickable" position="0 1.2 0.2" radius="0.06" height="0.4" rotation="90 0 0" color="#a855f7" material="emissive: #a855f7; emissiveIntensity: 0.6" visible="false">
+      </a-cylinder>
+    </a-entity>
+
+    <!-- ===== OBJECT 3: LAB WORKBENCH & MONITOR ===== -->
+    <a-entity position="-4 0 2">
+      <a-box position="0 0.7 0" width="1.8" height="0.1" depth="1" color="#334155"></a-box>
+      <a-box position="0 1.4 -0.3" width="1" height="0.7" depth="0.1" color="#0a0f1d">
+        <a-plane position="0 0 0.06" width="0.9" height="0.6" color="#000000">
+          <a-text value="DIAGNOSTICS:\nAll systems nominal.\nCheck perimeter walls\nfor UV anomalies." color="#00f3ff" position="-0.4 0.2 0.01" scale="0.35 0.35 0.35"></a-text>
+        </a-plane>
+      </a-box>
+    </a-entity>
+
+    <!-- ===== OBJECT 4: HIDDEN UV WALL HINT ===== -->
+    <a-entity position="0 3 -5.9">
+      <a-plane id="uv-wall-sign" position="0 0 0.01" width="3" height="1.5" color="#0f172a" material="opacity: 0.1">
+        <a-text id="uv-code-text" value="[ HIDDEN UV CODE: 8 - 4 - 2 ]" color="#a855f7" align="center" position="0 0 0.01" scale="0.6 0.6 0.6" visible="false"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- ===== OBJECT 5: SECURITY KEYPAD TERMINAL ===== -->
+    <a-entity id="keypad-panel" position="2 2 -5.9">
+      <a-box width="1.2" height="1.8" depth="0.1" color="#1e293b"></a-box>
+      <!-- Display Screen -->
+      <a-plane position="0 0.5 0.06" width="1" height="0.4" color="#000000">
+        <a-text id="keypad-display" value="LOCKED" color="#ff3366" align="center" position="0 0 0.01" scale="0.7 0.7 0.7"></a-text>
+      </a-plane>
+
+      <!-- Keypad Buttons (Grid Layout) -->
+      <a-box class="clickable btn-num" data-val="1" position="-0.3 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="1" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="2" position="0 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="2" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="3" position="0.3 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="3" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="4" position="-0.3 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="4" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="5" position="0 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="5" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="6" position="0.3 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="6" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="7" position="-0.3 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="7" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="8" position="0 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="8" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="9" position="0.3 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="9" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
+    </a-entity>
+
+    <!-- ===== ESCAPE DOORS ===== -->
+    <a-entity id="exit-door-group" position="-1.5 0 -5.9">
       <a-box position="0 2.2 0" width="2.4" height="0.2" depth="0.2" color="#334155"></a-box>
       <a-box position="-1.1 1.1 0" width="0.2" height="2.2" depth="0.2" color="#334155"></a-box>
       <a-box position="1.1 1.1 0" width="0.2" height="2.2" depth="0.2" color="#334155"></a-box>
       
-      <!-- Sliding Left Door -->
       <a-box id="door-left" position="-0.5 1.1 0" width="1" height="2" depth="0.05" color="#0f172a" material="metalness: 0.8">
         <a-box position="0.4 0 0.03" width="0.05" height="1.8" depth="0.02" color="#00f3ff"></a-box>
       </a-box>
-      <!-- Sliding Right Door -->
       <a-box id="door-right" position="0.5 1.1 0" width="1" height="2" depth="0.05" color="#0f172a" material="metalness: 0.8">
         <a-box position="-0.4 0 0.03" width="0.05" height="1.8" depth="0.02" color="#00f3ff"></a-box>
       </a-box>
@@ -366,14 +327,16 @@
   <script>
     // ===== GAME STATE OBJECT =====
     const gameState = {
-      hasCore: false,         // Boolean: Core collected
-      isPowered: false,       // Boolean: Pedestal powered up
-      enteredCode: "",        // String: Keypad buffer
-      targetCode: "379",      // Target code string
-      isUnlocked: false       // Boolean: Win state trigger
+      hasKeycard: false,
+      lockerOpen: false,
+      hasFlashlight: false,
+      uvActive: false,
+      enteredCode: "",
+      targetCode: "842",
+      isUnlocked: false
     };
 
-    // Sound FX Synthesis using Web Audio API
+    // Sound FX Synthesis
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep(freq, duration) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -399,68 +362,77 @@
         document.getElementById('objective').innerText = instructionText;
       }
       
-      const stCore = document.getElementById('st-core');
-      const stPower = document.getElementById('st-power');
+      const stKey = document.getElementById('st-keycard');
+      const stLocker = document.getElementById('st-locker');
+      const stLight = document.getElementById('st-light');
       const stDoor = document.getElementById('st-door');
 
-      if (gameState.hasCore) {
-        stCore.innerText = "YES";
-        stCore.className = "active";
-      }
-      if (gameState.isPowered) {
-        stPower.innerText = "YES";
-        stPower.className = "active";
-      }
-      if (gameState.isUnlocked) {
-        stDoor.innerText = "UNLOCKED";
-        stDoor.className = "active";
-      }
+      if (gameState.hasKeycard) { stKey.innerText = "YES"; stKey.className = "active"; }
+      if (gameState.lockerOpen) { stLocker.innerText = "OPEN"; stLocker.className = "active"; }
+      if (gameState.hasFlashlight) { stLight.innerText = "YES"; stLight.className = "active"; }
+      if (gameState.isUnlocked) { stDoor.innerText = "UNLOCKED"; stDoor.className = "active"; }
     }
 
-    // Init Logic on DOM Load
+    // DOM Interaction Setup
     window.addEventListener('DOMContentLoaded', () => {
-      const core = document.getElementById('plasma-core');
-      const slot = document.getElementById('pedestal-slot');
+      const keycard = document.getElementById('keycard');
+      const lockerDoor = document.getElementById('locker-door');
+      const flashlight = document.getElementById('flashlight');
+      const uvCodeText = document.getElementById('uv-code-text');
       const keypadBtns = document.querySelectorAll('.btn-num');
       const keypadDisplay = document.getElementById('keypad-display');
 
-      // Interaction 1: Pick Up Plasma Core
-      core.addEventListener('click', () => {
-        if (!gameState.hasCore) {
-          gameState.hasCore = true;
+      // 1. Pick Up Keycard
+      keycard.addEventListener('click', () => {
+        if (!gameState.hasKeycard) {
+          gameState.hasKeycard = true;
           playBeep(600, 150);
-          core.setAttribute('visible', 'false');
-          core.classList.remove('clickable');
-          updateHUD("2. Insert Plasma Core into the Power Pedestal slot on the left wall.");
+          keycard.setAttribute('visible', 'false');
+          keycard.classList.remove('clickable');
+          updateHUD("2. Keycard collected! Use it to unlock the Storage Locker on the left wall.");
         }
       });
 
-      // Interaction 2: Power Up Pedestal
-      slot.addEventListener('click', () => {
-        if (gameState.hasCore && !gameState.isPowered) {
-          gameState.isPowered = true;
+      // 2. Unlock Storage Locker
+      lockerDoor.addEventListener('click', () => {
+        if (gameState.hasKeycard && !gameState.lockerOpen) {
+          gameState.lockerOpen = true;
           playBeep(800, 300);
+          lockerDoor.setAttribute('animation', 'property: rotation; to: 0 -110 0; dur: 1000; easing: easeOutQuad');
+          document.getElementById('locker-status').setAttribute('value', 'OPEN');
+          document.getElementById('locker-status').setAttribute('color', '#00ff66');
+          flashlight.setAttribute('visible', 'true');
+          updateHUD("3. Locker open! Retrieve the UV Flashlight from inside.");
+        } else if (!gameState.hasKeycard) {
+          playBeep(200, 200);
+          updateHUD("Locker locked! Find and collect the Security Keycard first.");
+        }
+      });
+
+      // 3. Pick Up UV Flashlight
+      flashlight.addEventListener('click', () => {
+        if (gameState.lockerOpen && !gameState.hasFlashlight) {
+          gameState.hasFlashlight = true;
+          playBeep(700, 200);
+          flashlight.setAttribute('visible', 'false');
+          flashlight.classList.remove('clickable');
           
-          // Visual updates
-          document.getElementById('slot-ring').setAttribute('color', '#00ff66');
-          document.getElementById('pedestal-light').setAttribute('color', '#00ff66');
-          document.getElementById('room-light').setAttribute('intensity', '1.2');
+          // Reveal Hidden UV Code on Wall
+          gameState.uvActive = true;
+          uvCodeText.setAttribute('visible', 'true');
           keypadDisplay.setAttribute('value', '---');
           keypadDisplay.setAttribute('color', '#00f3ff');
 
-          updateHUD("3. Power Restored! Locate the passkey hint on the monitor and enter it into the keypad.");
-        } else if (!gameState.hasCore) {
-          playBeep(200, 200);
-          updateHUD("Slot empty! Find and pick up the Plasma Core on the table first.");
+          updateHUD("4. UV Flashlight active! Look at the north wall to read the hidden code (8-4-2), then enter it into the keypad.");
         }
       });
 
-      // Interaction 3: Keypad Numerical Buttons
+      // 4. Keypad Button Inputs
       keypadBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-          if (!gameState.isPowered) {
+          if (!gameState.hasFlashlight) {
             playBeep(150, 200);
-            updateHUD("Terminal unpowered! Power up the Pedestal first.");
+            updateHUD("Terminal requires active power / flashlight scan first!");
             return;
           }
 
@@ -472,21 +444,18 @@
           gameState.enteredCode += val;
           keypadDisplay.setAttribute('value', gameState.enteredCode);
 
-          // Check Code Buffer
           if (gameState.enteredCode.length === 3) {
             if (gameState.enteredCode === gameState.targetCode) {
-              // SUCCESS
               gameState.isUnlocked = true;
               playBeep(900, 500);
               keypadDisplay.setAttribute('value', 'OPEN');
               keypadDisplay.setAttribute('color', '#00ff66');
-              updateHUD("Door Unlocked! Proceed through the main doors.");
+              updateHUD("Door Unlocked! Escape sequence initiated.");
               triggerEscapeSequence();
             } else {
-              // FAIL
               playBeep(180, 400);
               keypadDisplay.setAttribute('value', 'ERR');
-              keypadDisplay.setAttribute('color', '#ff0055');
+              keypadDisplay.setAttribute('color', '#ff3366');
               setTimeout(() => {
                 gameState.enteredCode = "";
                 keypadDisplay.setAttribute('value', '---');
@@ -497,28 +466,21 @@
         });
       });
 
-      // Interactive Hover Effects for Visual UX Feedback
-      const clickables = document.querySelectorAll('.clickable');
-      clickables.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-          el.setAttribute('scale', '1.08 1.08 1.08');
-        });
-        el.addEventListener('mouseleave', () => {
-          el.setAttribute('scale', '1 1 1');
-        });
+      // Hover feedback effects
+      document.querySelectorAll('.clickable').forEach(el => {
+        el.addEventListener('mouseenter', () => el.setAttribute('scale', '1.08 1.08 1.08'));
+        el.addEventListener('mouseleave', () => el.setAttribute('scale', '1 1 1'));
       });
     });
 
-    // Final Escape Animation Trigger
+    // Escape Animation & Win Screen
     function triggerEscapeSequence() {
       const doorLeft = document.getElementById('door-left');
       const doorRight = document.getElementById('door-right');
 
-      // Animate sliding doors
       doorLeft.setAttribute('animation', 'property: position; to: -1.4 1.1 0; dur: 2000; easing: easeOutQuad');
       doorRight.setAttribute('animation', 'property: position; to: 1.4 1.1 0; dur: 2000; easing: easeOutQuad');
 
-      // Show win screen after 2.5 seconds
       setTimeout(() => {
         document.getElementById('win-screen').style.display = 'flex';
       }, 2500);
