@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cyber Lab: Advanced VR Escape Room</title>
+  <title>Neon Cyber Lab: 3D VR Escape Room</title>
   <!-- A-Frame Library -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <style>
@@ -13,72 +13,73 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Heads-Up Display Overlay */
+    /* Vibrant Neon HUD Overlay */
     #hud {
       position: absolute;
       top: 15px;
       left: 15px;
       z-index: 9999;
-      background: rgba(10, 15, 30, 0.9);
-      border: 2px solid #00f3ff;
-      border-radius: 10px;
-      padding: 15px 20px;
+      background: rgba(15, 5, 30, 0.9);
+      border: 2px solid #ff007f;
+      border-radius: 12px;
+      padding: 15px 22px;
       color: #ffffff;
-      width: 340px;
-      box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+      width: 350px;
+      box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
       pointer-events: none;
     }
 
     #hud h2 {
       margin: 0 0 8px 0;
-      font-size: 1.1rem;
-      color: #00f3ff;
+      font-size: 1.15rem;
+      color: #ff007f;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 8px rgba(255, 0, 127, 0.6);
     }
 
     #objective {
       font-size: 0.95rem;
-      color: #e0e0e0;
+      color: #f1f5f9;
       margin-bottom: 12px;
-      line-height: 1.3;
+      line-height: 1.4;
     }
 
     .status-box {
       font-size: 0.85rem;
-      border-top: 1px solid rgba(0, 243, 255, 0.3);
+      border-top: 1px solid rgba(255, 0, 127, 0.4);
       padding-top: 8px;
     }
 
     .status-item {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
 
-    .active { color: #00ff66; font-weight: bold; }
+    .active { color: #00ffcc; font-weight: bold; text-shadow: 0 0 6px rgba(0, 255, 204, 0.6); }
     .inactive { color: #ff3366; }
 
-    /* Summary Modal Trigger Button */
+    /* Summary Modal Button */
     #summary-btn {
       position: absolute;
       top: 15px;
       right: 15px;
       z-index: 9999;
-      background: #00f3ff;
-      color: #050b14;
+      background: linear-gradient(135deg, #ff007f, #7928ca);
+      color: #ffffff;
       border: none;
       padding: 10px 18px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
       transition: all 0.2s ease;
     }
 
     #summary-btn:hover {
-      background: #00c2cb;
       transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.7);
     }
 
     /* Modal Styling */
@@ -89,7 +90,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(5, 2, 15, 0.9);
       z-index: 10000;
       justify-content: center;
       align-items: center;
@@ -98,22 +99,22 @@
     }
 
     #summary-card {
-      background: #0d1322;
-      border: 2px solid #00f3ff;
-      border-radius: 12px;
+      background: #120826;
+      border: 2px solid #ff007f;
+      border-radius: 14px;
       width: 100%;
       max-width: 800px;
       max-height: 90vh;
       overflow-y: auto;
       padding: 30px;
-      color: #d1d5db;
-      box-shadow: 0 0 25px rgba(0, 243, 255, 0.2);
+      color: #e2e8f0;
+      box-shadow: 0 0 30px rgba(255, 0, 127, 0.3);
       position: relative;
     }
 
-    #summary-card h1 { color: #00f3ff; margin-top: 0; border-bottom: 1px solid #00f3ff; padding-bottom: 10px; }
-    #summary-card h2 { color: #ff007f; margin-top: 20px; font-size: 1.2rem; }
-    #summary-card code { background: #1a233a; padding: 2px 6px; border-radius: 4px; color: #00ff66; font-family: monospace; }
+    #summary-card h1 { color: #ff007f; margin-top: 0; border-bottom: 1px solid #ff007f; padding-bottom: 10px; }
+    #summary-card h2 { color: #00ffcc; margin-top: 20px; font-size: 1.2rem; }
+    #summary-card code { background: #1e113a; padding: 2px 6px; border-radius: 4px; color: #00ffcc; font-family: monospace; }
     
     .close-modal {
       position: absolute;
@@ -125,7 +126,7 @@
       font-weight: bold;
     }
 
-    /* Win Screen Overlay */
+    /* Win Screen */
     #win-screen {
       display: none;
       position: fixed;
@@ -133,358 +134,158 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(5, 20, 10, 0.95);
+      background: rgba(10, 30, 20, 0.95);
       z-index: 10001;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: #00ff66;
+      color: #00ffcc;
       text-align: center;
     }
 
-    #win-screen h1 { font-size: 3.5rem; text-shadow: 0 0 20px #00ff66; margin-bottom: 10px; }
+    #win-screen h1 { font-size: 3.8rem; text-shadow: 0 0 25px #00ffcc; margin-bottom: 10px; }
     #win-screen p { font-size: 1.5rem; color: #ffffff; }
     #restart-btn {
       margin-top: 20px;
-      padding: 12px 25px;
-      background: #00ff66;
-      color: #000;
+      padding: 12px 28px;
+      background: #00ffcc;
+      color: #050b14;
       border: none;
       font-size: 1.1rem;
       font-weight: bold;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
     }
   </style>
 </head>
 <body>
 
-  <!-- UI Overlay: HUD -->
+  <!-- UI HUD -->
   <div id="hud">
-    <h2>Mission Objective</h2>
-    <div id="objective">1. Locate the Security Keycard on the main lab desk.</div>
+    <h2>Neon Lab Objective</h2>
+    <div id="objective">1. Locate the glowing Neon Keycard on the central workstation.</div>
     <div class="status-box">
-      <div class="status-item">Security Keycard: <span id="st-keycard" class="inactive">NO</span></div>
-      <div class="status-item">Storage Locker: <span id="st-locker" class="inactive">LOCKED</span></div>
-      <div class="status-item">UV Flashlight: <span id="st-light" class="inactive">NO</span></div>
-      <div class="status-item">Exit Door: <span id="st-door" class="inactive">LOCKED</span></div>
+      <div class="status-item">Neon Keycard: <span id="st-keycard" class="inactive">NO</span></div>
+      <div class="status-item">Storage Vault: <span id="st-locker" class="inactive">LOCKED</span></div>
+      <div class="status-item">Plasma Torch: <span id="st-light" class="inactive">NO</span></div>
+      <div class="status-item">Security Gate: <span id="st-door" class="inactive">LOCKED</span></div>
     </div>
   </div>
 
-  <!-- Summary Button -->
+  <!-- Summary Trigger -->
   <button id="summary-btn" onclick="toggleSummary(true)">📄 One-Page Game Summary</button>
 
   <!-- Summary Modal Window -->
   <div id="modal-overlay">
     <div id="summary-card">
       <span class="close-modal" onclick="toggleSummary(false)">&times;</span>
-      <h1>One-Page Game Summary</h1>
+      <h1>One-Page Game Summary (Neon Edition)</h1>
       
       <h2>1. Game Overview</h2>
-      <p><strong>Game Name:</strong> Cyber Lab: Advanced Escape</p>
-      <p><strong>Theme:</strong> High-Tech Cyberpunk Security Facility</p>
-      <p><strong>Player Objective:</strong> Collect the keycard, open the equipment locker, retrieve the UV flashlight, scan the wall for hidden ultraviolet codes, and input the code into the security terminal to escape.</p>
-      <p><strong>Main Puzzles:</strong>
-        <br>• <em>Puzzle 1 (Access Control):</em> Use the Keycard to unlock the Storage Locker.
-        <br>• <em>Puzzle 2 (Ultraviolet Scanning):</em> Use the UV Flashlight on the north lab wall to reveal encrypted code digits (<code>8-4-2</code>).
-        <br>• <em>Puzzle 3 (Terminal Input):</em> Enter the correct code sequence into the wall keypad to trigger the sliding exit doors.
-      </p>
-
-      <h2>2. Programming Techniques</h2>
-      <p>• <strong>Game State Tracking:</strong> Multiple boolean and counter variables (<code>hasKeycard</code>, <code>lockerOpen</code>, <code>hasFlashlight</code>, <code>uvActive</code>, <code>enteredCode</code>) manage player progression across dependent stages.</p>
-      <p>• <strong>Event Listeners & DOM API:</strong> Uses A-Frame click/mouseenter listeners combined with Web Audio API sound synthesis for responsive feedback.</p>
-      <p>• <strong>Conditional Logic:</strong> Nested `if / else if` statements validate player inventory before allowing interactions like opening lockers or entering passcodes.</p>
+      <p><strong>Game Name:</strong> Neon Cyber Lab Escape</p>
+      <p><strong>Theme:</strong> High-Contrast Synthwave Cyberpunk Research Vault</p>
+      <p><strong>Player Objective:</strong> Retrieve the keycard, unlock the vault compartment, collect the ultraviolet torch, reveal the hidden wall cipher, and input the passcode into the neon terminal to escape.</p>
+      
+      <h2>2. Programming Techniques & State</h2>
+      <p>• <strong>Boolean State Tracking:</strong> Manages complex item collection sequences (<code>hasKeycard</code>, <code>vaultOpen</code>, <code>hasTorch</code>, <code>isUnlocked</code>).</p>
+      <p>• <strong>Event Handling:</strong> Listens for raycaster clicks and hovers across complex 3D primitives.</p>
 
       <h2>3. User Experience (UX) Decisions</h2>
-      <p><strong>Visual Feedback:</strong> Interactive objects scale up on hover (`mouseenter`), change color on activation, and update real-time status items in the HUD.</p>
-
-      <h2>4. Evaluation</h2>
-      <p><strong>What Worked Well:</strong> The multi-tiered puzzle chain ensures the player interacts with multiple objects across the 3D environment.</p>
-      <p><strong>Future Improvement:</strong> Adding movable physics objects or laser mirrors.</p>
+      <p>• Rich glowing neon shaders (`emissive` lighting), pulsing animations, and instant audio feedback ensure high immersion and clear player direction.</p>
     </div>
   </div>
 
-  <!-- Win Screen Overlay -->
+  <!-- Win Screen -->
   <div id="win-screen">
-    <h1>FACILITY ESCAPED!</h1>
-    <p>You successfully bypassed all security locks and exited the lab.</p>
+    <h1>CYBER VAULT BREACHED!</h1>
+    <p>All neon security barriers successfully bypassed.</p>
     <button id="restart-btn" onclick="location.reload()">Play Again</button>
   </div>
 
   <!-- A-Frame 3D Scene -->
   <a-scene cursor="rayOrigin: mouse" raycaster="objects: .clickable">
     
-    <!-- Camera & Cursor Setup -->
+    <!-- Camera & Cursor -->
     <a-entity id="rig" position="0 0 3">
       <a-camera id="camera">
         <a-cursor 
           fuse="false" 
           raycaster="objects: .clickable" 
-          material="color: #00f3ff; shader: flat" 
+          material="color: #00ffcc; shader: flat" 
           position="0 0 -1" 
           geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.02">
         </a-cursor>
       </a-camera>
     </a-entity>
 
-    <!-- Lighting -->
-    <a-ambient-light color="#111827" intensity="0.7"></a-ambient-light>
-    <a-point-light color="#00f3ff" position="0 4 0" intensity="0.9"></a-point-light>
+    <!-- Vibrant Lighting -->
+    <a-ambient-light color="#2a0845" intensity="0.8"></a-ambient-light>
+    <a-point-light color="#ff007f" position="-3 4 -2" intensity="1.2"></a-point-light>
+    <a-point-light color="#00ffcc" position="3 4 2" intensity="1.2"></a-point-light>
 
-    <!-- Room Structure (Enclosed Lab Interior) -->
-    <a-plane position="0 0 0" rotation="-90 0 0" width="12" height="12" color="#1e293b"></a-plane>
-    <a-plane position="0 6 0" rotation="90 0 0" width="12" height="12" color="#0f172a"></a-plane>
-    <a-plane position="0 3 -6" rotation="0 0 0" width="12" height="6" color="#0f172a"></a-plane>
-    <a-plane position="0 3 6" rotation="0 180 0" width="12" height="6" color="#0f172a"></a-plane>
-    <a-plane position="-6 3 0" rotation="0 90 0" width="12" height="6" color="#0f172a"></a-plane>
-    <a-plane position="6 3 0" rotation="0 -90 0" width="12" height="6" color="#0f172a"></a-plane>
+    <!-- 3D Neon Styled Room Structure -->
+    <!-- Floor Grid Plane -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="14" height="14" color="#0b061a" material="roughness: 0.2; metalness: 0.8"></a-plane>
+    <!-- Ceiling -->
+    <a-plane position="0 7 0" rotation="90 0 0" width="14" height="14" color="#120826"></a-plane>
+    <!-- Walls with rich dark tones -->
+    <a-plane position="0 3.5 -7" rotation="0 0 0" width="14" height="7" color="#150a28"></a-plane>
+    <a-plane position="0 3.5 7" rotation="0 180 0" width="14" height="7" color="#150a28"></a-plane>
+    <a-plane position="-7 3.5 0" rotation="0 90 0" width="14" height="7" color="#150a28"></a-plane>
+    <a-plane position="7 3.5 0" rotation="0 -90 0" width="14" height="7" color="#150a28"></a-plane>
 
-    <!-- Wall Accent Decor Stripes -->
-    <a-box position="0 5.8 -5.9" width="11.8" height="0.1" depth="0.1" color="#00f3ff"></a-box>
+    <!-- Neon Accent Glowing Strips -->
+    <a-box position="0 6.8 -6.9" width="13.8" height="0.1" depth="0.1" color="#ff007f" material="emissive: #ff007f; emissiveIntensity: 1"></a-box>
+    <a-box position="0 6.8 6.9" width="13.8" height="0.1" depth="0.1" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 1"></a-box>
 
-    <!-- ===== OBJECT 1: CENTRAL LAB DESK ===== -->
+    <!-- ===== OBJECT 1: CENTRAL WORKSTATION TABLE & NEON KEYCARD ===== -->
     <a-entity position="2 0 -2">
-      <a-box position="0 0.8 0" width="2.2" height="0.1" depth="1.2" color="#334155"></a-box>
-      <a-cylinder position="-0.9 0.4 -0.4" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
-      <a-cylinder position="0.9 0.4 -0.4" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
-      <a-cylinder position="-0.9 0.4 0.4" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
-      <a-cylinder position="0.9 0.4 0.4" radius="0.05" height="0.8" color="#64748b"></a-cylinder>
+      <!-- 3D Layered Desk -->
+      <a-box position="0 0.9 0" width="2.4" height="0.15" depth="1.3" color="#1e113a" material="metalness: 0.5"></a-box>
+      <a-box position="0 0.82 0" width="2.2" height="0.05" depth="1.1" color="#ff007f" material="emissive: #ff007f; emissiveIntensity: 0.4"></a-box>
+      <!-- Thick Cyber Legs -->
+      <a-cylinder position="-1 0.4 -0.5" radius="0.08" height="0.8" color="#311959"></a-cylinder>
+      <a-cylinder position="1 0.4 -0.5" radius="0.08" height="0.8" color="#311959"></a-cylinder>
+      <a-cylinder position="-1 0.4 0.5" radius="0.08" height="0.8" color="#311959"></a-cylinder>
+      <a-cylinder position="1 0.4 0.5" radius="0.08" height="0.8" color="#311959"></a-cylinder>
 
-      <!-- INTERACTIVE OBJECT A: SECURITY KEYCARD -->
-      <a-box id="keycard" class="clickable" position="0 0.9 0" width="0.3" height="0.02" depth="0.2" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 0.5" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000">
-        <a-text value="KEYCARD" align="center" rotation="-90 0 0" position="0 0.02 0" scale="0.3 0.3 0.3" color="#ffffff"></a-text>
+      <!-- Interactive Neon Keycard -->
+      <a-box id="keycard" class="clickable" position="0 1.05 0" width="0.35" height="0.03" depth="0.25" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.8" animation="property: rotation; to: 0 360 0; loop: true; dur: 4500">
+        <a-text value="KEY" align="center" rotation="-90 0 0" position="0 0.03 0" scale="0.35 0.35 0.35" color="#050b14"></a-text>
       </a-box>
     </a-entity>
 
-    <!-- ===== OBJECT 2: STORAGE LOCKER ===== -->
-    <a-entity id="locker" position="-4.5 0 -2">
-      <!-- Locker Frame -->
-      <a-box position="0 1.5 0" width="1.2" height="3" depth="0.8" color="#1e293b"></a-box>
-      <!-- Locker Door (Left) -->
-      <a-box id="locker-door" class="clickable" position="-0.6 1.5 0.4" width="1.2" height="2.9" depth="0.08" color="#334155" rotation="0 0 0" pivot="-0.6 0 0">
-        <a-text id="locker-status" value="LOCKED" align="center" position="0 0 0.05" scale="0.6 0.6 0.6" color="#ff3366"></a-text>
+    <!-- ===== OBJECT 2: STORAGE VAULT ===== -->
+    <a-entity id="locker" position="-5 0 -2">
+      <a-box position="0 1.8 0" width="1.4" height="3.4" depth="0.9" color="#1a0c33"></a-box>
+      <!-- Vault Door -->
+      <a-box id="locker-door" class="clickable" position="-0.7 1.8 0.45" width="1.3" height="3.2" depth="0.1" color="#311959" material="metalness: 0.7">
+        <a-torus position="0 0 0.06" radius="0.25" radius-tubular="0.02" color="#ff007f" material="emissive: #ff007f; emissiveIntensity: 0.8"></a-torus>
+        <a-text id="locker-status" value="LOCKED" align="center" position="0 -0.8 0.06" scale="0.5 0.5 0.5" color="#ff3366"></a-text>
       </a-box>
 
-      <!-- OBJECT INSIDE LOCKER: UV FLASHLIGHT -->
-      <a-cylinder id="flashlight" class="clickable" position="0 1.2 0.2" radius="0.06" height="0.4" rotation="90 0 0" color="#a855f7" material="emissive: #a855f7; emissiveIntensity: 0.6" visible="false">
+      <!-- Plasma Torch Inside Vault -->
+      <a-cylinder id="flashlight" class="clickable" position="0 1.4 0.2" radius="0.07" height="0.5" rotation="90 0 0" color="#ff00ff" material="emissive: #ff00ff; emissiveIntensity: 0.9" visible="false">
       </a-cylinder>
     </a-entity>
 
-    <!-- ===== OBJECT 3: LAB WORKBENCH & MONITOR ===== -->
-    <a-entity position="-4 0 2">
-      <a-box position="0 0.7 0" width="1.8" height="0.1" depth="1" color="#334155"></a-box>
-      <a-box position="0 1.4 -0.3" width="1" height="0.7" depth="0.1" color="#0a0f1d">
-        <a-plane position="0 0 0.06" width="0.9" height="0.6" color="#000000">
-          <a-text value="DIAGNOSTICS:\nAll systems nominal.\nCheck perimeter walls\nfor UV anomalies." color="#00f3ff" position="-0.4 0.2 0.01" scale="0.35 0.35 0.35"></a-text>
-        </a-plane>
-      </a-box>
-    </a-entity>
-
-    <!-- ===== OBJECT 4: HIDDEN UV WALL HINT ===== -->
-    <a-entity position="0 3 -5.9">
-      <a-plane id="uv-wall-sign" position="0 0 0.01" width="3" height="1.5" color="#0f172a" material="opacity: 0.1">
-        <a-text id="uv-code-text" value="[ HIDDEN UV CODE: 8 - 4 - 2 ]" color="#a855f7" align="center" position="0 0 0.01" scale="0.6 0.6 0.6" visible="false"></a-text>
+    <!-- ===== OBJECT 3: HOLOGRAPHIC CIPHER WALL ===== -->
+    <a-entity position="0 3.5 -6.9">
+      <a-plane id="uv-wall-sign" position="0 0 0.02" width="3.5" height="1.8" color="#120826" material="opacity: 0.2">
+        <a-text id="uv-code-text" value="[ CIPHER CODE: 5 - 9 - 1 ]" color="#00ffcc" align="center" position="0 0 0.01" scale="0.7 0.7 0.7" visible="false" material="emissive: #00ffcc; emissiveIntensity: 0.8"></a-text>
       </a-plane>
     </a-entity>
 
-    <!-- ===== OBJECT 5: SECURITY KEYPAD TERMINAL ===== -->
-    <a-entity id="keypad-panel" position="2 2 -5.9">
-      <a-box width="1.2" height="1.8" depth="0.1" color="#1e293b"></a-box>
+    <!-- ===== OBJECT 4: NEON SECURITY KEYPAD ===== -->
+    <a-entity id="keypad-panel" position="2.2 2.2 -6.85">
+      <a-box width="1.3" height="2" depth="0.12" color="#1a0c33" material="metalness: 0.6"></a-box>
       <!-- Display Screen -->
-      <a-plane position="0 0.5 0.06" width="1" height="0.4" color="#000000">
-        <a-text id="keypad-display" value="LOCKED" color="#ff3366" align="center" position="0 0 0.01" scale="0.7 0.7 0.7"></a-text>
+      <a-plane position="0 0.6 0.07" width="1.1" height="0.45" color="#050b14">
+        <a-text id="keypad-display" value="LOCKED" color="#ff3366" align="center" position="0 0 0.01" scale="0.75 0.75 0.75"></a-text>
       </a-plane>
 
-      <!-- Keypad Buttons (Grid Layout) -->
-      <a-box class="clickable btn-num" data-val="1" position="-0.3 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="1" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="2" position="0 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="2" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="3" position="0.3 0.1 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="3" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="4" position="-0.3 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="4" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="5" position="0 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="5" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="6" position="0.3 -0.2 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="6" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="7" position="-0.3 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="7" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="8" position="0 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="8" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="9" position="0.3 -0.5 0.06" width="0.2" height="0.2" depth="0.05" color="#334155"><a-text value="9" align="center" position="0 0 0.03" scale="0.4 0.4 0.4"></a-text></a-box>
-    </a-entity>
-
-    <!-- ===== ESCAPE DOORS ===== -->
-    <a-entity id="exit-door-group" position="-1.5 0 -5.9">
-      <a-box position="0 2.2 0" width="2.4" height="0.2" depth="0.2" color="#334155"></a-box>
-      <a-box position="-1.1 1.1 0" width="0.2" height="2.2" depth="0.2" color="#334155"></a-box>
-      <a-box position="1.1 1.1 0" width="0.2" height="2.2" depth="0.2" color="#334155"></a-box>
-      
-      <a-box id="door-left" position="-0.5 1.1 0" width="1" height="2" depth="0.05" color="#0f172a" material="metalness: 0.8">
-        <a-box position="0.4 0 0.03" width="0.05" height="1.8" depth="0.02" color="#00f3ff"></a-box>
-      </a-box>
-      <a-box id="door-right" position="0.5 1.1 0" width="1" height="2" depth="0.05" color="#0f172a" material="metalness: 0.8">
-        <a-box position="-0.4 0 0.03" width="0.05" height="1.8" depth="0.02" color="#00f3ff"></a-box>
-      </a-box>
-    </a-entity>
-
-  </a-scene>
-
-  <!-- Game Logic & Event Handling -->
-  <script>
-    // ===== GAME STATE OBJECT =====
-    const gameState = {
-      hasKeycard: false,
-      lockerOpen: false,
-      hasFlashlight: false,
-      uvActive: false,
-      enteredCode: "",
-      targetCode: "842",
-      isUnlocked: false
-    };
-
-    // Sound FX Synthesis
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(freq, duration) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + (duration / 1000));
-    }
-
-    // Modal Control
-    function toggleSummary(show) {
-      document.getElementById('modal-overlay').style.display = show ? 'flex' : 'none';
-    }
-
-    // Dynamic HUD Status Updates
-    function updateHUD(instructionText) {
-      if (instructionText) {
-        document.getElementById('objective').innerText = instructionText;
-      }
-      
-      const stKey = document.getElementById('st-keycard');
-      const stLocker = document.getElementById('st-locker');
-      const stLight = document.getElementById('st-light');
-      const stDoor = document.getElementById('st-door');
-
-      if (gameState.hasKeycard) { stKey.innerText = "YES"; stKey.className = "active"; }
-      if (gameState.lockerOpen) { stLocker.innerText = "OPEN"; stLocker.className = "active"; }
-      if (gameState.hasFlashlight) { stLight.innerText = "YES"; stLight.className = "active"; }
-      if (gameState.isUnlocked) { stDoor.innerText = "UNLOCKED"; stDoor.className = "active"; }
-    }
-
-    // DOM Interaction Setup
-    window.addEventListener('DOMContentLoaded', () => {
-      const keycard = document.getElementById('keycard');
-      const lockerDoor = document.getElementById('locker-door');
-      const flashlight = document.getElementById('flashlight');
-      const uvCodeText = document.getElementById('uv-code-text');
-      const keypadBtns = document.querySelectorAll('.btn-num');
-      const keypadDisplay = document.getElementById('keypad-display');
-
-      // 1. Pick Up Keycard
-      keycard.addEventListener('click', () => {
-        if (!gameState.hasKeycard) {
-          gameState.hasKeycard = true;
-          playBeep(600, 150);
-          keycard.setAttribute('visible', 'false');
-          keycard.classList.remove('clickable');
-          updateHUD("2. Keycard collected! Use it to unlock the Storage Locker on the left wall.");
-        }
-      });
-
-      // 2. Unlock Storage Locker
-      lockerDoor.addEventListener('click', () => {
-        if (gameState.hasKeycard && !gameState.lockerOpen) {
-          gameState.lockerOpen = true;
-          playBeep(800, 300);
-          lockerDoor.setAttribute('animation', 'property: rotation; to: 0 -110 0; dur: 1000; easing: easeOutQuad');
-          document.getElementById('locker-status').setAttribute('value', 'OPEN');
-          document.getElementById('locker-status').setAttribute('color', '#00ff66');
-          flashlight.setAttribute('visible', 'true');
-          updateHUD("3. Locker open! Retrieve the UV Flashlight from inside.");
-        } else if (!gameState.hasKeycard) {
-          playBeep(200, 200);
-          updateHUD("Locker locked! Find and collect the Security Keycard first.");
-        }
-      });
-
-      // 3. Pick Up UV Flashlight
-      flashlight.addEventListener('click', () => {
-        if (gameState.lockerOpen && !gameState.hasFlashlight) {
-          gameState.hasFlashlight = true;
-          playBeep(700, 200);
-          flashlight.setAttribute('visible', 'false');
-          flashlight.classList.remove('clickable');
-          
-          // Reveal Hidden UV Code on Wall
-          gameState.uvActive = true;
-          uvCodeText.setAttribute('visible', 'true');
-          keypadDisplay.setAttribute('value', '---');
-          keypadDisplay.setAttribute('color', '#00f3ff');
-
-          updateHUD("4. UV Flashlight active! Look at the north wall to read the hidden code (8-4-2), then enter it into the keypad.");
-        }
-      });
-
-      // 4. Keypad Button Inputs
-      keypadBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (!gameState.hasFlashlight) {
-            playBeep(150, 200);
-            updateHUD("Terminal requires active power / flashlight scan first!");
-            return;
-          }
-
-          if (gameState.isUnlocked) return;
-
-          const val = btn.getAttribute('data-val');
-          playBeep(450, 100);
-          
-          gameState.enteredCode += val;
-          keypadDisplay.setAttribute('value', gameState.enteredCode);
-
-          if (gameState.enteredCode.length === 3) {
-            if (gameState.enteredCode === gameState.targetCode) {
-              gameState.isUnlocked = true;
-              playBeep(900, 500);
-              keypadDisplay.setAttribute('value', 'OPEN');
-              keypadDisplay.setAttribute('color', '#00ff66');
-              updateHUD("Door Unlocked! Escape sequence initiated.");
-              triggerEscapeSequence();
-            } else {
-              playBeep(180, 400);
-              keypadDisplay.setAttribute('value', 'ERR');
-              keypadDisplay.setAttribute('color', '#ff3366');
-              setTimeout(() => {
-                gameState.enteredCode = "";
-                keypadDisplay.setAttribute('value', '---');
-                keypadDisplay.setAttribute('color', '#00f3ff');
-              }, 1000);
-            }
-          }
-        });
-      });
-
-      // Hover feedback effects
-      document.querySelectorAll('.clickable').forEach(el => {
-        el.addEventListener('mouseenter', () => el.setAttribute('scale', '1.08 1.08 1.08'));
-        el.addEventListener('mouseleave', () => el.setAttribute('scale', '1 1 1'));
-      });
-    });
-
-    // Escape Animation & Win Screen
-    function triggerEscapeSequence() {
-      const doorLeft = document.getElementById('door-left');
-      const doorRight = document.getElementById('door-right');
-
-      doorLeft.setAttribute('animation', 'property: position; to: -1.4 1.1 0; dur: 2000; easing: easeOutQuad');
-      doorRight.setAttribute('animation', 'property: position; to: 1.4 1.1 0; dur: 2000; easing: easeOutQuad');
-
-      setTimeout(() => {
-        document.getElementById('win-screen').style.display = 'flex';
-      }, 2500);
-    }
-  </script>
-</body>
-</html>
+      <!-- Keypad Buttons -->
+      <a-box class="clickable btn-num" data-val="1" position="-0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="1" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="2" position="0 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="2" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="3" position="0.35 0
