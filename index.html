@@ -5,135 +5,320 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Lost Lab - VR Escape Room</title>
 
-  <!-- A-Frame creates the 3D environment -->
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+  </style>
 </head>
 
 <body>
 
-<a-scene background="color: #10172b">
+<a-scene
+  background="color: #080d20"
+  renderer="colorManagement: true">
 
   <!-- LIGHTING -->
   <a-entity light="type: ambient; intensity: 0.8"></a-entity>
-  <a-entity light="type: point; intensity: 1.5; color: #36bfff"
-            position="0 3 -3"></a-entity>
 
-  <!-- ROOM -->
-  <a-box position="0 0 -2" width="10" height="0.2"
-         depth="10" color="#30394f"></a-box>
+  <a-entity
+    light="type: point; intensity: 2; distance: 18; color: #00cfff"
+    position="0 4 -3">
+  </a-entity>
 
-  <a-box position="0 3 -7" width="10" height="6"
-         depth="0.2" color="#202b45"></a-box>
+  <a-entity
+    light="type: point; intensity: 1.5; distance: 12; color: #6d4dff"
+    position="-3 3 -2">
+  </a-entity>
 
-  <a-box position="-5 3 -2" width="0.2" height="6"
-         depth="10" color="#273650"></a-box>
+  <!-- FLOOR AND CEILING -->
+  <a-box position="0 -0.12 -2"
+    width="10" height="0.2" depth="10"
+    color="#18243b">
+  </a-box>
 
-  <a-box position="5 3 -2" width="0.2" height="6"
-         depth="10" color="#273650"></a-box>
+  <a-box position="0 6 -2"
+    width="10" height="0.2" depth="10"
+    color="#10182c">
+  </a-box>
 
-  <a-box position="0 6 -2" width="10" height="0.2"
-         depth="10" color="#202b45"></a-box>
+  <!-- WALLS -->
+  <a-box position="0 3 -7"
+    width="10" height="6" depth="0.2"
+    color="#17233c">
+  </a-box>
 
-  <!-- ROOM LIGHTS -->
-  <a-box position="-2 5.8 -2" width="2" height="0.08"
-         depth="0.3" color="#35cfff"></a-box>
-  <a-box position="2 5.8 -2" width="2" height="0.08"
-         depth="0.3" color="#35cfff"></a-box>
+  <a-box position="-5 3 -2"
+    width="0.2" height="6" depth="10"
+    color="#202c49">
+  </a-box>
 
-  <!-- GAME TITLE AND INSTRUCTIONS -->
+  <a-box position="5 3 -2"
+    width="0.2" height="6" depth="10"
+    color="#202c49">
+  </a-box>
+
+  <a-box position="0 3 3"
+    width="10" height="6" depth="0.2"
+    color="#17233c">
+  </a-box>
+
+  <!-- FUTURISTIC FLOOR LIGHTS -->
+  <a-box position="-3 0.015 -2"
+    width="0.08" height="0.025" depth="8"
+    color="#00d9ff">
+  </a-box>
+
+  <a-box position="3 0.015 -2"
+    width="0.08" height="0.025" depth="8"
+    color="#00d9ff">
+  </a-box>
+
+  <a-box position="0 0.015 -5.8"
+    width="6" height="0.025" depth="0.08"
+    color="#7657ff">
+  </a-box>
+
+  <!-- CEILING LIGHTS -->
+  <a-box position="-2 5.85 -2"
+    width="2" height="0.05" depth="0.3"
+    color="#00d9ff"
+    material="emissive: #00aaff; emissiveIntensity: 0.8">
+  </a-box>
+
+  <a-box position="2 5.85 -2"
+    width="2" height="0.05" depth="0.3"
+    color="#00d9ff"
+    material="emissive: #00aaff; emissiveIntensity: 0.8">
+  </a-box>
+
+  <!-- GAME TITLE -->
   <a-text value="THE LOST LAB"
-          position="-1.5 4.8 -6.85"
-          color="#56e5ff" width="5"></a-text>
+    position="-1.55 4.9 -6.82"
+    color="#55eaff"
+    width="5"
+    align="center">
+  </a-text>
 
-  <a-text value="Find the energy key."
-          position="-2.1 4.2 -6.85"
-          color="white" width="4"></a-text>
+  <a-text value="ESCAPE PROTOCOL: 314"
+    position="-1.8 4.45 -6.82"
+    color="#ffffff"
+    width="4"
+    align="center">
+  </a-text>
 
-  <a-text value="Discover the code: 314"
-          position="-2.1 3.8 -6.85"
-          color="#ffd166" width="4"></a-text>
+  <!-- DECORATION: WALL PANELS -->
+  <a-box position="-3.7 3 -6.82"
+    width="1.1" height="2" depth="0.1"
+    color="#253858">
+  </a-box>
 
-  <!-- PUZZLE 1: ENERGY KEY -->
-  <a-cylinder id="keyBase"
-              position="-2 0.5 -2.5"
-              radius="0.65" height="0.4"
-              color="#46516b"></a-cylinder>
+  <a-box position="3.7 3 -6.82"
+    width="1.1" height="2" depth="0.1"
+    color="#253858">
+  </a-box>
+
+  <a-box position="-3.7 3 -6.75"
+    width="0.8" height="0.08" depth="0.04"
+    color="#00d9ff">
+  </a-box>
+
+  <a-box position="3.7 3 -6.75"
+    width="0.8" height="0.08" depth="0.04"
+    color="#7657ff">
+  </a-box>
+
+  <!-- PUZZLE 1: ENERGY KEY STAND -->
+  <a-cylinder position="-2 0.25 -2.5"
+    radius="0.8" height="0.4"
+    color="#34445f">
+  </a-cylinder>
+
+  <a-cylinder position="-2 0.47 -2.5"
+    radius="0.65" height="0.05"
+    color="#00aaff"
+    material="emissive: #0077ff; emissiveIntensity: 0.7">
+  </a-cylinder>
 
   <a-sphere id="energyKey"
-             class="clickable"
-             position="-2 1.35 -2.5"
-             radius="0.35"
-             color="#00eaff"
-             material="emissive: #00aaff; emissiveIntensity: 1"
-             animation="property: rotation; to: 0 360 0;
-                        loop: true; dur: 4000">
+    class="clickable"
+    position="-2 1.2 -2.5"
+    radius="0.35"
+    color="#00f0ff"
+    material="emissive: #00bbff; emissiveIntensity: 1"
+    animation="property: rotation; to: 0 360 0; loop: true; dur: 3000"
+    animation__float="property: position; to: -2 1.35 -2.5; dir: alternate; loop: true; dur: 1200">
   </a-sphere>
 
   <a-text value="ENERGY KEY"
-          position="-2.8 0.9 -2.5"
-          color="white" width="2.5"></a-text>
+    position="-2.8 0.8 -2.5"
+    color="#ffffff"
+    width="2.5">
+  </a-text>
 
-  <!-- PUZZLE 2: SECURITY PANEL -->
+  <!-- KEY STATUS LIGHT -->
+  <a-sphere id="keyLight"
+    position="-2 0.72 -2.5"
+    radius="0.09"
+    color="#ffcc44">
+  </a-sphere>
+
+  <!-- PUZZLE 2: SECURITY CONSOLE -->
   <a-box position="2 1.8 -3.5"
-         width="2.5" height="2.5" depth="0.25"
-         color="#151c30"></a-box>
+    width="2.7" height="2.7" depth="0.3"
+    color="#111a30">
+  </a-box>
+
+  <a-box position="2 2.85 -3.31"
+    width="2.1" height="0.35" depth="0.05"
+    color="#253d5c">
+  </a-box>
 
   <a-text value="SECURITY PANEL"
-          position="1.05 2.7 -3.34"
-          color="#56e5ff" width="3"></a-text>
+    position="1.12 2.79 -3.27"
+    color="#55eaff"
+    width="2.8">
+  </a-text>
 
-  <!-- CODE BUTTONS -->
+  <!-- CODE DISPLAY -->
+  <a-box position="2 2.4 -3.29"
+    width="2.1" height="0.42" depth="0.06"
+    color="#06101b">
+  </a-box>
+
+  <a-text id="codeDisplay"
+    value="_ _ _"
+    position="1.55 2.32 -3.24"
+    color="#00ffb7"
+    width="2"
+    align="left">
+  </a-text>
+
+  <!-- NUMBER BUTTONS -->
   <a-box id="button3" class="clickable"
-         position="1.4 2.1 -3.3"
-         width="0.45" height="0.45" depth="0.12"
-         color="#3278a8"></a-box>
-  <a-text value="3" position="1.32 2.02 -3.22"
-          color="white" width="1.5"></a-text>
+    position="1.4 1.85 -3.27"
+    width="0.48" height="0.48" depth="0.14"
+    color="#2479b9">
+  </a-box>
+
+  <a-text value="3"
+    position="1.32 1.77 -3.18"
+    color="#ffffff" width="1.5">
+  </a-text>
 
   <a-box id="button1" class="clickable"
-         position="2 2.1 -3.3"
-         width="0.45" height="0.45" depth="0.12"
-         color="#3278a8"></a-box>
-  <a-text value="1" position="1.92 2.02 -3.22"
-          color="white" width="1.5"></a-text>
+    position="2 1.85 -3.27"
+    width="0.48" height="0.48" depth="0.14"
+    color="#2479b9">
+  </a-box>
+
+  <a-text value="1"
+    position="1.92 1.77 -3.18"
+    color="#ffffff" width="1.5">
+  </a-text>
 
   <a-box id="button4" class="clickable"
-         position="2.6 2.1 -3.3"
-         width="0.45" height="0.45" depth="0.12"
-         color="#3278a8"></a-box>
-  <a-text value="4" position="2.52 2.02 -3.22"
-          color="white" width="1.5"></a-text>
+    position="2.6 1.85 -3.27"
+    width="0.48" height="0.48" depth="0.14"
+    color="#2479b9">
+  </a-box>
 
+  <a-text value="4"
+    position="2.52 1.77 -3.18"
+    color="#ffffff" width="1.5">
+  </a-text>
+
+  <!-- SUBMIT AND RESET -->
   <a-box id="submitButton" class="clickable"
-         position="2 1.35 -3.3"
-         width="1.4" height="0.45" depth="0.12"
-         color="#16876b"></a-box>
-  <a-text value="SUBMIT"
-          position="1.55 1.27 -3.22"
-          color="white" width="2"></a-text>
+    position="1.65 1.22 -3.27"
+    width="0.9" height="0.4" depth="0.14"
+    color="#16876b">
+  </a-box>
 
-  <!-- EXIT DOOR -->
+  <a-text value="ENTER"
+    position="1.35 1.15 -3.18"
+    color="#ffffff" width="1.5">
+  </a-text>
+
+  <a-box id="resetButton" class="clickable"
+    position="2.55 1.22 -3.27"
+    width="0.7" height="0.4" depth="0.14"
+    color="#a34b55">
+  </a-box>
+
+  <a-text value="RESET"
+    position="2.32 1.15 -3.18"
+    color="#ffffff" width="1.2">
+  </a-text>
+
+  <!-- EXIT DOOR FRAME -->
+  <a-box position="0 1.8 -6.72"
+    width="2.3" height="3.8" depth="0.25"
+    color="#00a9d4">
+  </a-box>
+
+  <!-- INTERACTIVE EXIT DOOR -->
   <a-box id="exitDoor" class="clickable"
-         position="0 1.7 -6.75"
-         width="1.8" height="3.2" depth="0.25"
-         color="#8b3545"></a-box>
+    position="0 1.8 -6.54"
+    width="1.9" height="3.4" depth="0.18"
+    color="#8b3545">
+
+    <a-box position="0 0 0.56"
+      width="1.65" height="3.15" depth="0.03"
+      color="#202c49">
+    </a-box>
+  </a-box>
+
+  <a-sphere position="0.65 1.8 -6.25"
+    radius="0.09"
+    color="#ffcc44">
+  </a-sphere>
 
   <a-text value="EXIT"
-          position="-0.45 1.7 -6.58"
-          color="white" width="2"></a-text>
+    position="-0.4 2 -6.28"
+    color="#ffffff" width="2">
+  </a-text>
+
+  <!-- GAME INSTRUCTIONS -->
+  <a-box position="0 0.8 0.5"
+    width="3.7" height="1.2" depth="0.1"
+    color="#101b32">
+  </a-box>
+
+  <a-text value="MISSION"
+    position="-1.55 1.15 0.43"
+    color="#55eaff" width="3">
+  </a-text>
+
+  <a-text value="1. Collect the energy key"
+    position="-1.55 0.85 0.43"
+    color="#ffffff" width="3.5">
+  </a-text>
+
+  <a-text value="2. Enter code 314"
+    position="-1.55 0.58 0.43"
+    color="#ffffff" width="3.5">
+  </a-text>
 
   <!-- STATUS MESSAGE -->
   <a-text id="statusText"
-          value="Find the energy key to begin!"
-          position="-2.5 0.4 -3"
-          color="#ffffff" width="5"></a-text>
+    value="Welcome! Find the energy key."
+    position="-2.5 0.3 -2"
+    color="#ffffff"
+    width="5"
+    align="center">
+  </a-text>
 
-  <!-- PLAYER CAMERA -->
+  <!-- PLAYER CAMERA AND MOVEMENT -->
   <a-entity position="0 1.6 4">
-    <a-camera wasd-controls="acceleration: 20"
-              look-controls
-              cursor="rayOrigin: mouse"
-              raycaster="objects: .clickable; far: 20">
+    <a-camera
+      wasd-controls="acceleration: 20"
+      look-controls
+      cursor="rayOrigin: mouse"
+      raycaster="objects: .clickable; far: 20">
     </a-camera>
   </a-entity>
 
@@ -148,42 +333,66 @@
 
   const correctCode = "314";
 
+  // CONNECT HTML ELEMENTS TO JAVASCRIPT
   const statusText = document.querySelector("#statusText");
   const energyKey = document.querySelector("#energyKey");
+  const keyLight = document.querySelector("#keyLight");
   const exitDoor = document.querySelector("#exitDoor");
+  const codeDisplay = document.querySelector("#codeDisplay");
 
-  // Display feedback to the player
+  // DISPLAY FEEDBACK TO THE PLAYER
   function showMessage(message) {
     statusText.setAttribute("value", message);
   }
 
-  // PUZZLE 1: Collect the energy key
+  // UPDATE THE CODE DISPLAY
+  function updateDisplay() {
+    let displayCode = "";
+
+    for (let i = 0; i < 3; i++) {
+      if (i < enteredCode.length) {
+        displayCode += enteredCode[i] + " ";
+      } else {
+        displayCode += "_ ";
+      }
+    }
+
+    codeDisplay.setAttribute("value", displayCode);
+  }
+
+  // PUZZLE 1: COLLECT THE ENERGY KEY
   energyKey.addEventListener("click", function () {
-    if (!hasKey) {
+    if (!hasKey && !hasEscaped) {
       hasKey = true;
+
       energyKey.setAttribute("visible", false);
-      showMessage("Energy key collected! Find the security panel.");
-    } else {
-      showMessage("You already have the energy key.");
+      keyLight.setAttribute("color", "#00ff88");
+
+      showMessage("Key collected! Now unlock the security panel.");
+    } else if (hasKey) {
+      showMessage("You already collected the key!");
     }
   });
 
-  // Add a digit to the security code
+  // ADD A NUMBER TO THE CODE
   function addDigit(digit) {
-    if (!hasKey) {
-      showMessage("You need the energy key first!");
+    if (hasEscaped) {
+      showMessage("You have already escaped!");
+    } else if (!hasKey) {
+      showMessage("Find the energy key before using the panel!");
     } else if (codeSolved) {
-      showMessage("The security panel is already unlocked.");
-    } else if (enteredCode.length >= 3) {
-      enteredCode = digit;
-      showMessage("Code reset. Enter the three digits again.");
-    } else {
+      showMessage("The security panel is unlocked!");
+    } else if (enteredCode.length < 3) {
       enteredCode += digit;
-      showMessage("Code entered: " + "*".repeat(enteredCode.length));
+      updateDisplay();
+
+      showMessage("Enter the three-digit security code.");
+    } else {
+      showMessage("Press ENTER or RESET first!");
     }
   }
 
-  // Connect the number buttons to the function
+  // NUMBER BUTTON EVENT LISTENERS
   document.querySelector("#button3").addEventListener("click", function () {
     addDigit("3");
   });
@@ -196,31 +405,57 @@
     addDigit("4");
   });
 
-  // PUZZLE 2: Check the security code
+  // PUZZLE 2: CHECK THE SECURITY CODE
   document.querySelector("#submitButton").addEventListener("click", function () {
-    if (!hasKey) {
-      showMessage("Collect the energy key before using the panel!");
+    if (hasEscaped) {
+      showMessage("Congratulations! You have escaped.");
+    } else if (!hasKey) {
+      showMessage("You need the energy key first!");
     } else if (enteredCode === correctCode) {
       codeSolved = true;
-      showMessage("Correct code! The exit is now unlocked.");
+
+      showMessage("Correct code! The exit is unlocked!");
       exitDoor.setAttribute("color", "#16876b");
     } else {
       enteredCode = "";
+      updateDisplay();
+
       showMessage("Incorrect code. Try again!");
     }
   });
 
-  // FINAL GOAL: Escape the laboratory
+  // RESET THE CODE INPUT
+  document.querySelector("#resetButton").addEventListener("click", function () {
+    if (!codeSolved && !hasEscaped) {
+      enteredCode = "";
+      updateDisplay();
+
+      showMessage("Code reset. Try again!");
+    } else {
+      showMessage("The security panel is already unlocked.");
+    }
+  });
+
+  // FINAL GOAL: ESCAPE THE LAB
   exitDoor.addEventListener("click", function () {
     if (hasEscaped) {
-      showMessage("You have already escaped. Congratulations!");
+      showMessage("You have already escaped. Well done!");
     } else if (!hasKey) {
-      showMessage("The door is locked. Find the energy key!");
+      showMessage("The exit is locked! Find the energy key.");
     } else if (!codeSolved) {
       showMessage("Solve the security panel before escaping!");
     } else {
       hasEscaped = true;
+
       exitDoor.setAttribute("color", "#00cc88");
+
+      exitDoor.setAttribute("animation__open", {
+        property: "rotation",
+        to: "0 90 0",
+        dur: 1000,
+        easing: "easeInOutQuad"
+      });
+
       showMessage("YOU ESCAPED THE LOST LAB! Congratulations!");
     }
   });
