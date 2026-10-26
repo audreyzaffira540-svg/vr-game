@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neon Cyber Lab: 3D VR Escape Room</title>
+  <title>Deep Sea Submarine: Underwater VR Escape Room</title>
   <!-- A-Frame Library -->
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.6.0/aframe.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -13,41 +13,41 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Vibrant Neon HUD Overlay */
+    /* Oceanic HUD Overlay */
     #hud {
       position: absolute;
       top: 15px;
       left: 15px;
       z-index: 9999;
-      background: rgba(15, 5, 30, 0.9);
-      border: 2px solid #ff007f;
+      background: rgba(5, 20, 35, 0.9);
+      border: 2px solid #00d2ff;
       border-radius: 12px;
       padding: 15px 22px;
       color: #ffffff;
       width: 350px;
-      box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
       pointer-events: none;
     }
 
     #hud h2 {
       margin: 0 0 8px 0;
       font-size: 1.15rem;
-      color: #ff007f;
+      color: #00d2ff;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      text-shadow: 0 0 8px rgba(255, 0, 127, 0.6);
+      text-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
     }
 
     #objective {
       font-size: 0.95rem;
-      color: #f1f5f9;
+      color: #e2f1f8;
       margin-bottom: 12px;
       line-height: 1.4;
     }
 
     .status-box {
       font-size: 0.85rem;
-      border-top: 1px solid rgba(255, 0, 127, 0.4);
+      border-top: 1px solid rgba(0, 210, 255, 0.4);
       padding-top: 8px;
     }
 
@@ -57,8 +57,8 @@
       margin-bottom: 5px;
     }
 
-    .active { color: #00ffcc; font-weight: bold; text-shadow: 0 0 6px rgba(0, 255, 204, 0.6); }
-    .inactive { color: #ff3366; }
+    .active { color: #00ffaa; font-weight: bold; text-shadow: 0 0 6px rgba(0, 255, 170, 0.6); }
+    .inactive { color: #ff4466; }
 
     /* Summary Modal Button */
     #summary-btn {
@@ -66,20 +66,20 @@
       top: 15px;
       right: 15px;
       z-index: 9999;
-      background: linear-gradient(135deg, #ff007f, #7928ca);
+      background: linear-gradient(135deg, #0077b6, #00b4d8);
       color: #ffffff;
       border: none;
       padding: 10px 18px;
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+      box-shadow: 0 0 15px rgba(0, 180, 216, 0.5);
       transition: all 0.2s ease;
     }
 
     #summary-btn:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(0, 255, 204, 0.7);
+      box-shadow: 0 0 20px rgba(0, 255, 170, 0.7);
     }
 
     /* Modal Styling */
@@ -90,7 +90,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(5, 2, 15, 0.9);
+      background: rgba(2, 10, 20, 0.9);
       z-index: 10000;
       justify-content: center;
       align-items: center;
@@ -99,8 +99,8 @@
     }
 
     #summary-card {
-      background: #120826;
-      border: 2px solid #ff007f;
+      background: #071628;
+      border: 2px solid #00d2ff;
       border-radius: 14px;
       width: 100%;
       max-width: 800px;
@@ -108,19 +108,19 @@
       overflow-y: auto;
       padding: 30px;
       color: #e2e8f0;
-      box-shadow: 0 0 30px rgba(255, 0, 127, 0.3);
+      box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
       position: relative;
     }
 
-    #summary-card h1 { color: #ff007f; margin-top: 0; border-bottom: 1px solid #ff007f; padding-bottom: 10px; }
-    #summary-card h2 { color: #00ffcc; margin-top: 20px; font-size: 1.2rem; }
-    #summary-card code { background: #1e113a; padding: 2px 6px; border-radius: 4px; color: #00ffcc; font-family: monospace; }
+    #summary-card h1 { color: #00d2ff; margin-top: 0; border-bottom: 1px solid #00d2ff; padding-bottom: 10px; }
+    #summary-card h2 { color: #00ffaa; margin-top: 20px; font-size: 1.2rem; }
+    #summary-card code { background: #0f2c4a; padding: 2px 6px; border-radius: 4px; color: #00ffaa; font-family: monospace; }
     
     .close-modal {
       position: absolute;
       top: 15px;
       right: 20px;
-      color: #ff3366;
+      color: #ff4466;
       font-size: 1.8rem;
       cursor: pointer;
       font-weight: bold;
@@ -134,28 +134,28 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(10, 30, 20, 0.95);
+      background: rgba(5, 30, 25, 0.95);
       z-index: 10001;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: #00ffcc;
+      color: #00ffaa;
       text-align: center;
     }
 
-    #win-screen h1 { font-size: 3.8rem; text-shadow: 0 0 25px #00ffcc; margin-bottom: 10px; }
+    #win-screen h1 { font-size: 3.8rem; text-shadow: 0 0 25px #00ffaa; margin-bottom: 10px; }
     #win-screen p { font-size: 1.5rem; color: #ffffff; }
     #restart-btn {
       margin-top: 20px;
       padding: 12px 28px;
-      background: #00ffcc;
-      color: #050b14;
+      background: #00ffaa;
+      color: #05141c;
       border: none;
       font-size: 1.1rem;
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+      box-shadow: 0 0 15px rgba(0, 255, 170, 0.6);
     }
   </style>
 </head>
@@ -163,13 +163,13 @@
 
   <!-- UI HUD -->
   <div id="hud">
-    <h2>Neon Lab Objective</h2>
-    <div id="objective">1. Locate the glowing Neon Keycard on the central workstation.</div>
+    <h2>Submarine Objective</h2>
+    <div id="objective">1. Locate the golden Brass Diver Valve on the laboratory workbench.</div>
     <div class="status-box">
-      <div class="status-item">Neon Keycard: <span id="st-keycard" class="inactive">NO</span></div>
-      <div class="status-item">Storage Vault: <span id="st-locker" class="inactive">LOCKED</span></div>
-      <div class="status-item">Plasma Torch: <span id="st-light" class="inactive">NO</span></div>
-      <div class="status-item">Security Gate: <span id="st-door" class="inactive">LOCKED</span></div>
+      <div class="status-item">Brass Valve: <span id="st-valve" class="inactive">NO</span></div>
+      <div class="status-item">Airlock Locker: <span id="st-locker" class="inactive">LOCKED</span></div>
+      <div class="status-item">Sonar Scanner: <span id="st-light" class="inactive">NO</span></div>
+      <div class="status-item">Hatch Exit: <span id="st-door" class="inactive">LOCKED</span></div>
     </div>
   </div>
 
@@ -180,26 +180,26 @@
   <div id="modal-overlay">
     <div id="summary-card">
       <span class="close-modal" onclick="toggleSummary(false)">&times;</span>
-      <h1>One-Page Game Summary (Neon Edition)</h1>
+      <h1>One-Page Game Summary (Underwater Edition)</h1>
       
       <h2>1. Game Overview</h2>
-      <p><strong>Game Name:</strong> Neon Cyber Lab Escape</p>
-      <p><strong>Theme:</strong> High-Contrast Synthwave Cyberpunk Research Vault</p>
-      <p><strong>Player Objective:</strong> Retrieve the keycard, unlock the vault compartment, collect the ultraviolet torch, reveal the hidden wall cipher, and input the passcode into the neon terminal to escape.</p>
+      <p><strong>Game Name:</strong> Sunken Abyssal Submarine Escape</p>
+      <p><strong>Theme:</strong> Deep Sea Research Vessel & Ocean Trench</p>
+      <p><strong>Player Objective:</strong> Retrieve the brass valve, unlock the equipment compartment, collect the sonar scanner, reveal the hidden trench cipher, and input the sequence into the escape hatch control panel.</p>
       
       <h2>2. Programming Techniques & State</h2>
-      <p>• <strong>Boolean State Tracking:</strong> Manages complex item collection sequences (<code>hasKeycard</code>, <code>vaultOpen</code>, <code>hasTorch</code>, <code>isUnlocked</code>).</p>
-      <p>• <strong>Event Handling:</strong> Listens for raycaster clicks and hovers across complex 3D primitives.</p>
+      <p>• <strong>Boolean State Tracking:</strong> Manages sequential multi-step puzzle logic (<code>hasValve</code>, <code>lockerOpen</code>, <code>hasScanner</code>, <code>isUnlocked</code>).</p>
+      <p>• <strong>Event Handling:</strong> Listens for raycaster clicks and hovers across custom 3D marine equipment.</p>
 
       <h2>3. User Experience (UX) Decisions</h2>
-      <p>• Rich glowing neon shaders (`emissive` lighting), pulsing animations, and instant audio feedback ensure high immersion and clear player direction.</p>
+      <p>• Deep aqua marine tones, glowing coral panels, and audio feedback create an immersive underwater atmosphere.</p>
     </div>
   </div>
 
   <!-- Win Screen -->
   <div id="win-screen">
-    <h1>CYBER VAULT BREACHED!</h1>
-    <p>All neon security barriers successfully bypassed.</p>
+    <h1>SURFACED TO SAFETY!</h1>
+    <p>Submarine ballast tanks cleared and hatch successfully opened.</p>
     <button id="restart-btn" onclick="location.reload()">Play Again</button>
   </div>
 
@@ -212,102 +212,100 @@
         <a-cursor 
           fuse="false" 
           raycaster="objects: .clickable" 
-          material="color: #00ffcc; shader: flat" 
+          material="color: #00ffaa; shader: flat" 
           position="0 0 -1" 
           geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.02">
         </a-cursor>
       </a-camera>
     </a-entity>
 
-    <!-- Vibrant Lighting -->
-    <a-ambient-light color="#2a0845" intensity="0.8"></a-ambient-light>
-    <a-point-light color="#ff007f" position="-3 4 -2" intensity="1.2"></a-point-light>
-    <a-point-light color="#00ffcc" position="3 4 2" intensity="1.2"></a-point-light>
+    <!-- Underwater Lighting -->
+    <a-ambient-light color="#082b4a" intensity="0.9"></a-ambient-light>
+    <a-point-light color="#0099ff" position="-3 5 -2" intensity="1.2"></a-point-light>
+    <a-point-light color="#00ffaa" position="3 5 2" intensity="1.0"></a-point-light>
 
-    <!-- 3D Neon Styled Room Structure -->
-    <!-- Floor Grid Plane -->
-    <a-plane position="0 0 0" rotation="-90 0 0" width="14" height="14" color="#0b061a" material="roughness: 0.2; metalness: 0.8"></a-plane>
-    <!-- Ceiling -->
-    <a-plane position="0 7 0" rotation="90 0 0" width="14" height="14" color="#120826"></a-plane>
-    <!-- Walls with rich dark tones -->
-    <a-plane position="0 3.5 -7" rotation="0 0 0" width="14" height="7" color="#150a28"></a-plane>
-    <a-plane position="0 3.5 7" rotation="0 180 0" width="14" height="7" color="#150a28"></a-plane>
-    <a-plane position="-7 3.5 0" rotation="0 90 0" width="14" height="7" color="#150a28"></a-plane>
-    <a-plane position="7 3.5 0" rotation="0 -90 0" width="14" height="7" color="#150a28"></a-plane>
+    <!-- Submarine Interior Hull Structure -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="14" height="14" color="#0b1d28" material="roughness: 0.3; metalness: 0.7"></a-plane>
+    <a-plane position="0 7 0" rotation="90 0 0" width="14" height="14" color="#07141e"></a-plane>
+    <a-plane position="0 3.5 -7" rotation="0 0 0" width="14" height="7" color="#091b26"></a-plane>
+    <a-plane position="0 3.5 7" rotation="0 180 0" width="14" height="7" color="#091b26"></a-plane>
+    <a-plane position="-7 3.5 0" rotation="0 90 0" width="14" height="7" color="#091b26"></a-plane>
+    <a-plane position="7 3.5 0" rotation="0 -90 0" width="14" height="7" color="#091b26"></a-plane>
 
-    <!-- Neon Accent Glowing Strips -->
-    <a-box position="0 6.8 -6.9" width="13.8" height="0.1" depth="0.1" color="#ff007f" material="emissive: #ff007f; emissiveIntensity: 1"></a-box>
-    <a-box position="0 6.8 6.9" width="13.8" height="0.1" depth="0.1" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 1"></a-box>
+    <!-- Metal Hull Rib Accents -->
+    <a-box position="0 6.8 -6.9" width="13.8" height="0.15" depth="0.15" color="#1c3b52"></a-box>
+    <a-box position="0 6.8 6.9" width="13.8" height="0.15" depth="0.15" color="#1c3b52"></a-box>
 
-    <!-- ===== OBJECT 1: CENTRAL WORKSTATION TABLE & NEON KEYCARD ===== -->
+    <!-- ===== OBJECT 1: LAB WORKBENCH & BRASS VALVE ===== -->
     <a-entity position="2 0 -2">
-      <!-- 3D Layered Desk -->
-      <a-box position="0 0.9 0" width="2.4" height="0.15" depth="1.3" color="#1e113a" material="metalness: 0.5"></a-box>
-      <a-box position="0 0.82 0" width="2.2" height="0.05" depth="1.1" color="#ff007f" material="emissive: #ff007f; emissiveIntensity: 0.4"></a-box>
-      <!-- Thick Cyber Legs -->
-      <a-cylinder position="-1 0.4 -0.5" radius="0.08" height="0.8" color="#311959"></a-cylinder>
-      <a-cylinder position="1 0.4 -0.5" radius="0.08" height="0.8" color="#311959"></a-cylinder>
-      <a-cylinder position="-1 0.4 0.5" radius="0.08" height="0.8" color="#311959"></a-cylinder>
-      <a-cylinder position="1 0.4 0.5" radius="0.08" height="0.8" color="#311959"></a-cylinder>
+      <!-- Steel Work Desk -->
+      <a-box position="0 0.9 0" width="2.4" height="0.15" depth="1.3" color="#132c3d" material="metalness: 0.6"></a-box>
+      <a-box position="0 0.82 0" width="2.2" height="0.05" depth="1.1" color="#0077b6" material="emissive: #0077b6; emissiveIntensity: 0.3"></a-box>
+      <!-- Desk Legs -->
+      <a-cylinder position="-1 0.4 -0.5" radius="0.08" height="0.8" color="#1b3b52"></a-cylinder>
+      <a-cylinder position="1 0.4 -0.5" radius="0.08" height="0.8" color="#1b3b52"></a-cylinder>
+      <a-cylinder position="-1 0.4 0.5" radius="0.08" height="0.8" color="#1b3b52"></a-cylinder>
+      <a-cylinder position="1 0.4 0.5" radius="0.08" height="0.8" color="#1b3b52"></a-cylinder>
 
-      <!-- Interactive Neon Keycard -->
-      <a-box id="keycard" class="clickable" position="0 1.05 0" width="0.35" height="0.03" depth="0.25" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.8" animation="property: rotation; to: 0 360 0; loop: true; dur: 4500">
-        <a-text value="KEY" align="center" rotation="-90 0 0" position="0 0.03 0" scale="0.35 0.35 0.35" color="#050b14"></a-text>
-      </a-box>
-    </a-entity>
-
-    <!-- ===== OBJECT 2: STORAGE VAULT ===== -->
-    <a-entity id="locker" position="-5 0 -2">
-      <a-box position="0 1.8 0" width="1.4" height="3.4" depth="0.9" color="#1a0c33"></a-box>
-      <!-- Vault Door -->
-      <a-box id="locker-door" class="clickable" position="-0.7 1.8 0.45" width="1.3" height="3.2" depth="0.1" color="#311959" material="metalness: 0.7">
-        <a-torus position="0 0 0.06" radius="0.25" radius-tubular="0.02" color="#ff007f" material="emissive: #ff007f; emissiveIntensity: 0.8"></a-torus>
-        <a-text id="locker-status" value="LOCKED" align="center" position="0 -0.8 0.06" scale="0.5 0.5 0.5" color="#ff3366"></a-text>
-      </a-box>
-
-      <!-- Plasma Torch Inside Vault -->
-      <a-cylinder id="flashlight" class="clickable" position="0 1.4 0.2" radius="0.07" height="0.5" rotation="90 0 0" color="#ff00ff" material="emissive: #ff00ff; emissiveIntensity: 0.9" visible="false">
+      <!-- Interactive Brass Valve -->
+      <a-cylinder id="valve" class="clickable" position="0 1.05 0" radius="0.15" height="0.06" color="#d4af37" material="metalness: 0.9" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000">
+        <a-text value="VALVE" align="center" rotation="-90 0 0" position="0 0.04 0" scale="0.3 0.3 0.3" color="#ffffff"></a-text>
       </a-cylinder>
     </a-entity>
 
-    <!-- ===== OBJECT 3: HOLOGRAPHIC CIPHER WALL ===== -->
+    <!-- ===== OBJECT 2: EQUIPMENT LOCKER ===== -->
+    <a-entity id="locker" position="-5 0 -2">
+      <a-box position="0 1.8 0" width="1.4" height="3.4" depth="0.9" color="#0d2331"></a-box>
+      <!-- Locker Door -->
+      <a-box id="locker-door" class="clickable" position="-0.7 1.8 0.45" width="1.3" height="3.2" depth="0.1" color="#1b3b52" material="metalness: 0.7">
+        <a-ring position="0 0 0.06" radius-inner="0.15" radius-outer="0.22" color="#00d2ff"></a-ring>
+        <a-text id="locker-status" value="LOCKED" align="center" position="0 -0.8 0.06" scale="0.5 0.5 0.5" color="#ff4466"></a-text>
+      </a-box>
+
+      <!-- Sonar Scanner Inside Locker -->
+      <a-box id="sonar" class="clickable" position="0 1.4 0.2" width="0.3" height="0.4" depth="0.2" color="#00ffaa" material="emissive: #00ffaa; emissiveIntensity: 0.6" visible="false">
+        <a-text value="SONAR" align="center" rotation="0 0 0" position="0 0 0.11" scale="0.25 0.25 0.25" color="#05141c"></a-text>
+      </a-box>
+    </a-entity>
+
+    <!-- ===== OBJECT 3: HOLOGRAPHIC TRENCH CHART ===== -->
     <a-entity position="0 3.5 -6.9">
-      <a-plane id="uv-wall-sign" position="0 0 0.02" width="3.5" height="1.8" color="#120826" material="opacity: 0.2">
-        <a-text id="uv-code-text" value="[ CIPHER CODE: 5 - 9 - 1 ]" color="#00ffcc" align="center" position="0 0 0.01" scale="0.7 0.7 0.7" visible="false" material="emissive: #00ffcc; emissiveIntensity: 0.8"></a-text>
+      <a-plane id="chart-wall" position="0 0 0.02" width="3.5" height="1.8" color="#07141e" material="opacity: 0.3">
+        <a-text id="chart-code-text" value="[ TRENCH DEPTH CODE: 4 - 2 - 7 ]" color="#00ffaa" align="center" position="0 0 0.01" scale="0.65 0.65 0.65" visible="false" material="emissive: #00ffaa; emissiveIntensity: 0.7"></a-text>
       </a-plane>
     </a-entity>
 
-    <!-- ===== OBJECT 4: NEON SECURITY KEYPAD ===== -->
+    <!-- ===== OBJECT 4: SUBMARINE HATCH CONTROL PANEL ===== -->
     <a-entity id="keypad-panel" position="2.2 2.2 -6.85">
-      <a-box width="1.3" height="2" depth="0.12" color="#1a0c33" material="metalness: 0.6"></a-box>
+      <a-box width="1.3" height="2" depth="0.12" color="#0d2331" material="metalness: 0.6"></a-box>
       <!-- Display Screen -->
-      <a-plane position="0 0.6 0.07" width="1.1" height="0.45" color="#050b14">
-        <a-text id="keypad-display" value="LOCKED" color="#ff3366" align="center" position="0 0 0.01" scale="0.75 0.75 0.75"></a-text>
+      <a-plane position="0 0.6 0.07" width="1.1" height="0.45" color="#030b12">
+        <a-text id="keypad-display" value="LOCKED" color="#ff4466" align="center" position="0 0 0.01" scale="0.75 0.75 0.75"></a-text>
       </a-plane>
 
       <!-- Keypad Buttons -->
-      <a-box class="clickable btn-num" data-val="1" position="-0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="1" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="2" position="0 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="2" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="3" position="0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="3" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="4" position="-0.35 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="4" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="5" position="0 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="5" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="6" position="0.35 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="6" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="7" position="-0.35 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="7" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="8" position="0 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="8" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="9" position="0.35 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="9" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="1" position="-0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="1" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="2" position="0 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="2" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="3" position="0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="3" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="4" position="-0.35 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="4" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="5" position="0 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="5" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="6" position="0.35 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="6" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="7" position="-0.35 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="7" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="8" position="0 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="8" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="9" position="0.35 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="9" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
     </a-entity>
 
-    <!-- ===== ESCAPE GATE ===== -->
+    <!-- ===== ESCAPE HATCH DOORS ===== -->
     <a-entity id="exit-door-group" position="-1.8 0 -6.85">
-      <a-box position="0 2.4 0" width="2.6" height="0.2" depth="0.25" color="#ff007f" material="emissive: #ff007f; emissiveIntensity: 0.5"></a-box>
-      <a-box position="-1.2 1.2 0" width="0.2" height="2.4" depth="0.2" color="#311959"></a-box>
-      <a-box position="1.2 1.2 0" width="0.2" height="2.4" depth="0.2" color="#311959"></a-box>
+      <a-box position="0 2.4 0" width="2.6" height="0.2" depth="0.25" color="#0077b6" material="emissive: #0077b6; emissiveIntensity: 0.4"></a-box>
+      <a-box position="-1.2 1.2 0" width="0.2" height="2.4" depth="0.2" color="#1b3b52"></a-box>
+      <a-box position="1.2 1.2 0" width="0.2" height="2.4" depth="0.2" color="#1b3b52"></a-box>
       
-      <a-box id="door-left" position="-0.55 1.2 0" width="1.1" height="2.2" depth="0.06" color="#1a0c33" material="metalness: 0.9">
-        <a-box position="0.45 0 0.04" width="0.06" height="2" depth="0.03" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.6"></a-box>
+      <a-box id="door-left" position="-0.55 1.2 0" width="1.1" height="2.2" depth="0.06" color="#0d2331" material="metalness: 0.9">
+        <a-box position="0.45 0 0.04" width="0.06" height="2" depth="0.03" color="#00d2ff" material="emissive: #00d2ff; emissiveIntensity: 0.5"></a-box>
       </a-box>
-      <a-box id="door-right" position="0.55 1.2 0" width="1.1" height="2.2" depth="0.06" color="#1a0c33" material="metalness: 0.9">
-        <a-box position="-0.45 0 0.04" width="0.06" height="2" depth="0.03" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.6"></a-box>
+      <a-box id="door-right" position="0.55 1.2 0" width="1.1" height="2.2" depth="0.06" color="#0d2331" material="metalness: 0.9">
+        <a-box position="-0.45 0 0.04" width="0.06" height="2" depth="0.03" color="#00d2ff" material="emissive: #00d2ff; emissiveIntensity: 0.5"></a-box>
       </a-box>
     </a-entity>
 
@@ -316,12 +314,12 @@
   <!-- Game Logic Script -->
   <script>
     const gameState = {
-      hasKeycard: false,
-      vaultOpen: false,
-      hasTorch: false,
-      uvActive: false,
+      hasValve: false,
+      lockerOpen: false,
+      hasScanner: false,
+      sonarActive: false,
       enteredCode: "",
-      targetCode: "591",
+      targetCode: "427",
       isUnlocked: false
     };
 
@@ -346,78 +344,78 @@
     function updateHUD(text) {
       if (text) document.getElementById('objective').innerText = text;
       
-      const stKey = document.getElementById('st-keycard');
+      const stValve = document.getElementById('st-valve');
       const stLocker = document.getElementById('st-locker');
       const stLight = document.getElementById('st-light');
       const stDoor = document.getElementById('st-door');
 
-      if (gameState.hasKeycard) { stKey.innerText = "YES"; stKey.className = "active"; }
-      if (gameState.vaultOpen) { stLocker.innerText = "OPEN"; stLocker.className = "active"; }
-      if (gameState.hasTorch) { stLight.innerText = "YES"; stLight.className = "active"; }
+      if (gameState.hasValve) { stValve.innerText = "YES"; stValve.className = "active"; }
+      if (gameState.lockerOpen) { stLocker.innerText = "OPEN"; stLocker.className = "active"; }
+      if (gameState.hasScanner) { stLight.innerText = "YES"; stLight.className = "active"; }
       if (gameState.isUnlocked) { stDoor.innerText = "UNLOCKED"; stDoor.className = "active"; }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      const keycard = document.getElementById('keycard');
+      const valve = document.getElementById('valve');
       const lockerDoor = document.getElementById('locker-door');
-      const flashlight = document.getElementById('flashlight');
-      const uvCodeText = document.getElementById('uv-code-text');
+      const sonar = document.getElementById('sonar');
+      const chartCodeText = document.getElementById('chart-code-text');
       const keypadBtns = document.querySelectorAll('.btn-num');
       const keypadDisplay = document.getElementById('keypad-display');
 
-      keycard.addEventListener('click', () => {
-        if (!gameState.hasKeycard) {
-          gameState.hasKeycard = true;
-          playBeep(650, 150);
-          keycard.setAttribute('visible', 'false');
-          keycard.classList.remove('clickable');
-          updateHUD("2. Keycard acquired! Use it to unlock the Storage Vault on the left wall.");
+      valve.addEventListener('click', () => {
+        if (!gameState.hasValve) {
+          gameState.hasValve = true;
+          playBeep(550, 150);
+          valve.setAttribute('visible', 'false');
+          valve.classList.remove('clickable');
+          updateHUD("2. Brass Valve acquired! Use it to unlock the Airlock Locker on the left wall.");
         }
       });
 
       lockerDoor.addEventListener('click', () => {
-        if (gameState.hasKeycard && !gameState.vaultOpen) {
-          gameState.vaultOpen = true;
-          playBeep(850, 300);
+        if (gameState.hasValve && !gameState.lockerOpen) {
+          gameState.lockerOpen = true;
+          playBeep(750, 300);
           lockerDoor.setAttribute('animation', 'property: rotation; to: 0 -115 0; dur: 1000; easing: easeOutQuad');
           document.getElementById('locker-status').setAttribute('value', 'OPEN');
-          document.getElementById('locker-status').setAttribute('color', '#00ffcc');
-          flashlight.setAttribute('visible', 'true');
-          updateHUD("3. Vault open! Retrieve the Plasma Torch from inside.");
-        } else if (!gameState.hasKeycard) {
+          document.getElementById('locker-status').setAttribute('color', '#00ffaa');
+          sonar.setAttribute('visible', 'true');
+          updateHUD("3. Locker open! Retrieve the Sonar Scanner from inside.");
+        } else if (!gameState.hasValve) {
           playBeep(200, 200);
-          updateHUD("Vault is locked! Collect the Neon Keycard first.");
+          updateHUD("Locker sealed! Collect the Brass Valve first.");
         }
       });
 
-      flashlight.addEventListener('click', () => {
-        if (gameState.vaultOpen && !gameState.hasTorch) {
-          gameState.hasTorch = true;
-          playBeep(750, 200);
-          flashlight.setAttribute('visible', 'false');
-          flashlight.classList.remove('clickable');
+      sonar.addEventListener('click', () => {
+        if (gameState.lockerOpen && !gameState.hasScanner) {
+          gameState.hasScanner = true;
+          playBeep(650, 200);
+          sonar.setAttribute('visible', 'false');
+          sonar.classList.remove('clickable');
           
-          gameState.uvActive = true;
-          uvCodeText.setAttribute('visible', 'true');
+          gameState.sonarActive = true;
+          chartCodeText.setAttribute('visible', 'true');
           keypadDisplay.setAttribute('value', '---');
-          keypadDisplay.setAttribute('color', '#00ffcc');
+          keypadDisplay.setAttribute('color', '#00d2ff');
 
-          updateHUD("4. Torch active! Check the front wall for the cipher code (5-9-1), then enter it into the keypad.");
+          updateHUD("4. Sonar Scanner active! Read the trench depth code (4-2-7) on the front wall chart, then enter it into the hatch control panel.");
         }
       });
 
       keypadBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-          if (!gameState.hasTorch) {
+          if (!gameState.hasScanner) {
             playBeep(150, 200);
-            updateHUD("Terminal unpowered! Collect the Plasma Torch first.");
+            updateHUD("Panel unpowered! Collect the Sonar Scanner first.");
             return;
           }
 
           if (gameState.isUnlocked) return;
 
           const val = btn.getAttribute('data-val');
-          playBeep(500, 100);
+          playBeep(450, 100);
           
           gameState.enteredCode += val;
           keypadDisplay.setAttribute('value', gameState.enteredCode);
@@ -425,10 +423,10 @@
           if (gameState.enteredCode.length === 3) {
             if (gameState.enteredCode === gameState.targetCode) {
               gameState.isUnlocked = true;
-              playBeep(950, 500);
+              playBeep(900, 500);
               keypadDisplay.setAttribute('value', 'OPEN');
-              keypadDisplay.setAttribute('color', '#00ffcc');
-              updateHUD("Gate Unlocked! Escape sequence initiated.");
+              keypadDisplay.setAttribute('color', '#00ffaa');
+              updateHUD("Hatch Unlocked! Escape sequence initiated.");
               
               const doorLeft = document.getElementById('door-left');
               const doorRight = document.getElementById('door-right');
@@ -441,11 +439,11 @@
             } else {
               playBeep(180, 400);
               keypadDisplay.setAttribute('value', 'ERR');
-              keypadDisplay.setAttribute('color', '#ff3366');
+              keypadDisplay.setAttribute('color', '#ff4466');
               setTimeout(() => {
                 gameState.enteredCode = "";
                 keypadDisplay.setAttribute('value', '---');
-                keypadDisplay.setAttribute('color', '#00ffcc');
+                keypadDisplay.setAttribute('color', '#00d2ff');
               }, 1000);
             }
           }
