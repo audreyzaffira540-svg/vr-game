@@ -288,4 +288,175 @@
       <!-- Keypad Buttons -->
       <a-box class="clickable btn-num" data-val="1" position="-0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="1" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
       <a-box class="clickable btn-num" data-val="2" position="0 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="2" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="3" position="0.35 0
+      <a-box class="clickable btn-num" data-val="3" position="0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="3" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="4" position="-0.35 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="4" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="5" position="0 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="5" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="6" position="0.35 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="6" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="7" position="-0.35 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="7" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="8" position="0 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="8" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+      <a-box class="clickable btn-num" data-val="9" position="0.35 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#311959"><a-text value="9" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00ffcc"></a-text></a-box>
+    </a-entity>
+
+    <!-- ===== ESCAPE GATE ===== -->
+    <a-entity id="exit-door-group" position="-1.8 0 -6.85">
+      <a-box position="0 2.4 0" width="2.6" height="0.2" depth="0.25" color="#ff007f" material="emissive: #ff007f; emissiveIntensity: 0.5"></a-box>
+      <a-box position="-1.2 1.2 0" width="0.2" height="2.4" depth="0.2" color="#311959"></a-box>
+      <a-box position="1.2 1.2 0" width="0.2" height="2.4" depth="0.2" color="#311959"></a-box>
+      
+      <a-box id="door-left" position="-0.55 1.2 0" width="1.1" height="2.2" depth="0.06" color="#1a0c33" material="metalness: 0.9">
+        <a-box position="0.45 0 0.04" width="0.06" height="2" depth="0.03" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.6"></a-box>
+      </a-box>
+      <a-box id="door-right" position="0.55 1.2 0" width="1.1" height="2.2" depth="0.06" color="#1a0c33" material="metalness: 0.9">
+        <a-box position="-0.45 0 0.04" width="0.06" height="2" depth="0.03" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.6"></a-box>
+      </a-box>
+    </a-entity>
+
+  </a-scene>
+
+  <!-- Game Logic Script -->
+  <script>
+    const gameState = {
+      hasKeycard: false,
+      vaultOpen: false,
+      hasTorch: false,
+      uvActive: false,
+      enteredCode: "",
+      targetCode: "591",
+      isUnlocked: false
+    };
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq, duration) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + (duration / 1000));
+    }
+
+    function toggleSummary(show) {
+      document.getElementById('modal-overlay').style.display = show ? 'flex' : 'none';
+    }
+
+    function updateHUD(text) {
+      if (text) document.getElementById('objective').innerText = text;
+      
+      const stKey = document.getElementById('st-keycard');
+      const stLocker = document.getElementById('st-locker');
+      const stLight = document.getElementById('st-light');
+      const stDoor = document.getElementById('st-door');
+
+      if (gameState.hasKeycard) { stKey.innerText = "YES"; stKey.className = "active"; }
+      if (gameState.vaultOpen) { stLocker.innerText = "OPEN"; stLocker.className = "active"; }
+      if (gameState.hasTorch) { stLight.innerText = "YES"; stLight.className = "active"; }
+      if (gameState.isUnlocked) { stDoor.innerText = "UNLOCKED"; stDoor.className = "active"; }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const keycard = document.getElementById('keycard');
+      const lockerDoor = document.getElementById('locker-door');
+      const flashlight = document.getElementById('flashlight');
+      const uvCodeText = document.getElementById('uv-code-text');
+      const keypadBtns = document.querySelectorAll('.btn-num');
+      const keypadDisplay = document.getElementById('keypad-display');
+
+      keycard.addEventListener('click', () => {
+        if (!gameState.hasKeycard) {
+          gameState.hasKeycard = true;
+          playBeep(650, 150);
+          keycard.setAttribute('visible', 'false');
+          keycard.classList.remove('clickable');
+          updateHUD("2. Keycard acquired! Use it to unlock the Storage Vault on the left wall.");
+        }
+      });
+
+      lockerDoor.addEventListener('click', () => {
+        if (gameState.hasKeycard && !gameState.vaultOpen) {
+          gameState.vaultOpen = true;
+          playBeep(850, 300);
+          lockerDoor.setAttribute('animation', 'property: rotation; to: 0 -115 0; dur: 1000; easing: easeOutQuad');
+          document.getElementById('locker-status').setAttribute('value', 'OPEN');
+          document.getElementById('locker-status').setAttribute('color', '#00ffcc');
+          flashlight.setAttribute('visible', 'true');
+          updateHUD("3. Vault open! Retrieve the Plasma Torch from inside.");
+        } else if (!gameState.hasKeycard) {
+          playBeep(200, 200);
+          updateHUD("Vault is locked! Collect the Neon Keycard first.");
+        }
+      });
+
+      flashlight.addEventListener('click', () => {
+        if (gameState.vaultOpen && !gameState.hasTorch) {
+          gameState.hasTorch = true;
+          playBeep(750, 200);
+          flashlight.setAttribute('visible', 'false');
+          flashlight.classList.remove('clickable');
+          
+          gameState.uvActive = true;
+          uvCodeText.setAttribute('visible', 'true');
+          keypadDisplay.setAttribute('value', '---');
+          keypadDisplay.setAttribute('color', '#00ffcc');
+
+          updateHUD("4. Torch active! Check the front wall for the cipher code (5-9-1), then enter it into the keypad.");
+        }
+      });
+
+      keypadBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!gameState.hasTorch) {
+            playBeep(150, 200);
+            updateHUD("Terminal unpowered! Collect the Plasma Torch first.");
+            return;
+          }
+
+          if (gameState.isUnlocked) return;
+
+          const val = btn.getAttribute('data-val');
+          playBeep(500, 100);
+          
+          gameState.enteredCode += val;
+          keypadDisplay.setAttribute('value', gameState.enteredCode);
+
+          if (gameState.enteredCode.length === 3) {
+            if (gameState.enteredCode === gameState.targetCode) {
+              gameState.isUnlocked = true;
+              playBeep(950, 500);
+              keypadDisplay.setAttribute('value', 'OPEN');
+              keypadDisplay.setAttribute('color', '#00ffcc');
+              updateHUD("Gate Unlocked! Escape sequence initiated.");
+              
+              const doorLeft = document.getElementById('door-left');
+              const doorRight = document.getElementById('door-right');
+              doorLeft.setAttribute('animation', 'property: position; to: -1.6 1.2 0; dur: 2000; easing: easeOutQuad');
+              doorRight.setAttribute('animation', 'property: position; to: 1.6 1.2 0; dur: 2000; easing: easeOutQuad');
+
+              setTimeout(() => {
+                document.getElementById('win-screen').style.display = 'flex';
+              }, 2500);
+            } else {
+              playBeep(180, 400);
+              keypadDisplay.setAttribute('value', 'ERR');
+              keypadDisplay.setAttribute('color', '#ff3366');
+              setTimeout(() => {
+                gameState.enteredCode = "";
+                keypadDisplay.setAttribute('value', '---');
+                keypadDisplay.setAttribute('color', '#00ffcc');
+              }, 1000);
+            }
+          }
+        });
+      });
+
+      document.querySelectorAll('.clickable').forEach(el => {
+        el.addEventListener('mouseenter', () => el.setAttribute('scale', '1.1 1.1 1.1'));
+        el.addEventListener('mouseleave', () => el.setAttribute('scale', '1 1 1'));
+      });
+    });
+  </script>
+</body>
+</html>
