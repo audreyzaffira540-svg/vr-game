@@ -1,383 +1,412 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deep Sea Submarine: Underwater VR Escape Room</title>
-  
-  <!-- A-Frame Library (GitHub Pages Compatible CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
-
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #05141c;
-    }
-
-    /* Force A-Frame canvas to fill screen */
-    a-scene {
-      width: 100vw;
-      height: 100vh;
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    /* Oceanic HUD Overlay */
-    #hud {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      z-index: 9999;
-      background: rgba(5, 20, 35, 0.9);
-      border: 2px solid #00d2ff;
-      border-radius: 12px;
-      padding: 15px 22px;
-      color: #ffffff;
-      width: 320px;
-      box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
-      pointer-events: none;
-    }
-
-    #hud h2 {
-      margin: 0 0 8px 0;
-      font-size: 1.1rem;
-      color: #00d2ff;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      text-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
-    }
-
-    #objective {
-      font-size: 0.9rem;
-      color: #e2f1f8;
-      margin-bottom: 12px;
-      line-height: 1.4;
-    }
-
-    .status-box {
-      font-size: 0.85rem;
-      border-top: 1px solid rgba(0, 210, 255, 0.4);
-      padding-top: 8px;
-    }
-
-    .status-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
-    }
-
-    .active { color: #00ffaa; font-weight: bold; text-shadow: 0 0 6px rgba(0, 255, 170, 0.6); }
-    .inactive { color: #ff4466; }
-
-    /* Win Screen */
-    #win-screen {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(5, 30, 25, 0.95);
-      z-index: 10001;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #00ffaa;
-      text-align: center;
-    }
-
-    #win-screen h1 { font-size: 3.8rem; text-shadow: 0 0 25px #00ffaa; margin-bottom: 10px; }
-    #win-screen p { font-size: 1.5rem; color: #ffffff; }
-    #restart-btn {
-      margin-top: 20px;
-      padding: 12px 28px;
-      background: #00ffaa;
-      color: #05141c;
-      border: none;
-      font-size: 1.1rem;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(0, 255, 170, 0.6);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Laboratory - VR Escape Room</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 999;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        
+        #status-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border: 3px solid #00ff00;
+            border-radius: 5px;
+            font-size: 20px;
+            text-align: center;
+            display: none;
+            min-width: 400px;
+        }
+        
+        #instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            color: #ffff00;
+            font-family: Arial, sans-serif;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border: 2px solid #ffff00;
+            border-radius: 5px;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .puzzle-solved {
+            color: #00ff00 !important;
+        }
+        
+        .warning {
+            color: #ff0000 !important;
+        }
+    </style>
 </head>
 <body>
-
-  <!-- UI HUD -->
-  <div id="hud">
-    <h2>Submarine Objective</h2>
-    <div id="objective">1. Locate the golden Brass Diver Valve on the laboratory workbench.</div>
-    <div class="status-box">
-      <div class="status-item">Brass Valve: <span id="st-valve" class="inactive">NO</span></div>
-      <div class="status-item">Airlock Locker: <span id="st-locker" class="inactive">LOCKED</span></div>
-      <div class="status-item">Sonar Scanner: <span id="st-light" class="inactive">NO</span></div>
-      <div class="status-item">Hatch Exit: <span id="st-door" class="inactive">LOCKED</span></div>
+    <!-- HUD Display -->
+    <div id="hud">
+        <div>STATUS: <span id="status">INITIALIZING</span></div>
+        <div>PUZZLES SOLVED: <span id="puzzle-count">0/3</span></div>
+        <div style="margin-top: 10px; font-size: 12px;">
+            <div>Door Lock: <span id="door-status">LOCKED</span></div>
+            <div>Chemicals: <span id="chemical-status">NOT MIXED</span></div>
+            <div>Radiation: <span id="radiation-status">UNSAFE</span></div>
+        </div>
     </div>
-  </div>
-
-  <!-- Win Screen -->
-  <div id="win-screen">
-    <h1>SURFACED TO SAFETY!</h1>
-    <p>Submarine ballast tanks cleared and hatch successfully opened.</p>
-    <button id="restart-btn" onclick="location.reload()">Play Again</button>
-  </div>
-
-  <!-- A-Frame 3D Scene -->
-  <a-scene embedded cursor="rayOrigin: mouse" raycaster="objects: .clickable">
     
-    <!-- Camera & Cursor -->
-    <a-entity id="rig" position="0 0 3">
-      <a-camera id="camera">
-        <a-cursor 
-          fuse="false" 
-          raycaster="objects: .clickable" 
-          material="color: #00ffaa; shader: flat" 
-          position="0 0 -1" 
-          geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.02">
-        </a-cursor>
-      </a-camera>
-    </a-entity>
+    <!-- Status Message -->
+    <div id="status-message"></div>
+    
+    <!-- Instructions -->
+    <div id="instructions">
+        Click on objects to interact. Look for clues and solve puzzles to escape!
+    </div>
 
-    <!-- Underwater Lighting -->
-    <a-ambient-light color="#082b4a" intensity="1.2"></a-ambient-light>
-    <a-point-light color="#0099ff" position="-3 5 -2" intensity="1.5"></a-point-light>
-    <a-point-light color="#00ffaa" position="3 5 2" intensity="1.2"></a-point-light>
+    <!-- A-Frame Scene -->
+    <a-scene background="color: #1a1a2e" fog="type: linear; color: #1a1a2e; far: 100">
+        
+        <!-- Camera with Raycaster for Interaction -->
+        <a-entity id="camera" camera="userHeight: 1.6" position="0 0 5" look-controls wasd-controls>
+            <a-entity cursor="fuse: true; fuseTimeout: 2000" 
+                      position="0 0 -1"
+                      geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                      material="color: #4CAF50; shader: flat">
+            </a-entity>
+            <a-entity raycaster="objects: .interactive" line="color: #4CAF50"></a-entity>
+        </a-entity>
 
-    <!-- Submarine Interior Hull Structure -->
-    <a-plane position="0 0 0" rotation="-90 0 0" width="14" height="14" color="#0b1d28" material="roughness: 0.3; metalness: 0.7"></a-plane>
-    <a-plane position="0 7 0" rotation="90 0 0" width="14" height="14" color="#07141e"></a-plane>
-    <a-plane position="0 3.5 -7" rotation="0 0 0" width="14" height="7" color="#091b26"></a-plane>
-    <a-plane position="0 3.5 7" rotation="0 180 0" width="14" height="7" color="#091b26"></a-plane>
-    <a-plane position="-7 3.5 0" rotation="0 90 0" width="14" height="7" color="#091b26"></a-plane>
-    <a-plane position="7 3.5 0" rotation="0 -90 0" width="14" height="7" color="#091b26"></a-plane>
+        <!-- LIGHTING -->
+        <a-light type="ambient" color="#4a4a6a" intensity="0.6"></a-light>
+        <a-light type="directional" color="#ffffff" intensity="0.8" position="5 10 5"></a-light>
 
-    <!-- Metal Hull Rib Accents -->
-    <a-box position="0 6.8 -6.9" width="13.8" height="0.15" depth="0.15" color="#1c3b52"></a-box>
-    <a-box position="0 6.8 6.9" width="13.8" height="0.15" depth="0.15" color="#1c3b52"></a-box>
+        <!-- FLOOR -->
+        <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="20" height="20" 
+                  material="color: #2a2a4e; metalness: 0.6; roughness: 0.4;">
+        </a-plane>
 
-    <!-- ===== OBJECT 1: LAB WORKBENCH & BRASS VALVE ===== -->
-    <a-entity position="2 0 -2">
-      <!-- Steel Work Desk -->
-      <a-box position="0 0.9 0" width="2.4" height="0.15" depth="1.3" color="#132c3d" material="metalness: 0.6"></a-box>
-      <a-box position="0 0.82 0" width="2.2" height="0.05" depth="1.1" color="#0077b6" material="emissive: #0077b6; emissiveIntensity: 0.3"></a-box>
-      <!-- Desk Legs -->
-      <a-cylinder position="-1 0.4 -0.5" radius="0.08" height="0.8" color="#1b3b52"></a-cylinder>
-      <a-cylinder position="1 0.4 -0.5" radius="0.08" height="0.8" color="#1b3b52"></a-cylinder>
-      <a-cylinder position="-1 0.4 0.5" radius="0.08" height="0.8" color="#1b3b52"></a-cylinder>
-      <a-cylinder position="1 0.4 0.5" radius="0.08" height="0.8" color="#1b3b52"></a-cylinder>
+        <!-- WALLS -->
+        <a-plane position="-10 5 0" rotation="0 0 0" width="20" height="10"
+                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
+        </a-plane>
+        
+        <a-plane position="10 5 0" rotation="0 0 0" width="20" height="10"
+                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
+        </a-plane>
+        
+        <a-plane position="0 5 -10" rotation="0 0 0" width="20" height="10"
+                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
+        </a-plane>
 
-      <!-- Interactive Brass Valve -->
-      <a-cylinder id="valve" class="clickable" position="0 1.05 0" radius="0.18" height="0.08" color="#d4af37" material="metalness: 0.9" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000">
-        <a-text value="VALVE" align="center" rotation="-90 0 0" position="0 0.05 0" scale="0.4 0.4 0.4" color="#ffffff"></a-text>
-      </a-cylinder>
-    </a-entity>
+        <!-- CEILING -->
+        <a-plane position="0 10 0" rotation="90 0 0" width="20" height="20"
+                  material="color: #0f3460; metalness: 0.7; roughness: 0.3;">
+        </a-plane>
 
-    <!-- ===== OBJECT 2: EQUIPMENT LOCKER ===== -->
-    <a-entity id="locker" position="-5 0 -2">
-      <a-box position="0 1.8 0" width="1.4" height="3.4" depth="0.9" color="#0d2331"></a-box>
-      <!-- Locker Door -->
-      <a-box id="locker-door" class="clickable" position="-0.7 1.8 0.45" width="1.3" height="3.2" depth="0.1" color="#1b3b52" material="metalness: 0.7">
-        <a-ring position="0 0 0.06" radius-inner="0.15" radius-outer="0.22" color="#00d2ff"></a-ring>
-        <a-text id="locker-status" value="LOCKED" align="center" position="0 -0.8 0.06" scale="0.5 0.5 0.5" color="#ff4466"></a-text>
-      </a-box>
+        <!-- DOOR (Exit) -->
+        <a-box id="exit-door" class="interactive" position="-9.8 4 -9.8" width="2" height="5" depth="0.3"
+               material="color: #8b0000; metalness: 0.8; roughness: 0.2;">
+        </a-box>
+        
+        <a-text id="door-label" value="EXIT DOOR" position="-9.8 5.5 -9.5" scale="2 2 2"
+                color="#ffff00" align="center"></a-text>
 
-      <!-- Sonar Scanner Inside Locker -->
-      <a-box id="sonar" class="clickable" position="0 1.4 0.2" width="0.3" height="0.4" depth="0.2" color="#00ffaa" material="emissive: #00ffaa; emissiveIntensity: 0.6" visible="false">
-        <a-text value="SONAR" align="center" rotation="0 0 0" position="0 0 0.11" scale="0.25 0.25 0.25" color="#05141c"></a-text>
-      </a-box>
-    </a-entity>
+        <!-- PUZZLE 1: KEYPAD (for Door Lock) -->
+        <a-box id="keypad" class="interactive" position="-8 4 -9.6" width="1.5" height="2" depth="0.2"
+               material="color: #222222; metalness: 0.9; roughness: 0.1;">
+        </a-box>
+        
+        <a-text value="KEYPAD" position="-8 4.7 -9.4" scale="1.5 1.5 1.5"
+                color="#00ff00" align="center"></a-text>
 
-    <!-- ===== OBJECT 3: HOLOGRAPHIC TRENCH CHART ===== -->
-    <a-entity position="0 3.5 -6.9">
-      <a-plane id="chart-wall" position="0 0 0.02" width="3.5" height="1.8" color="#07141e" material="opacity: 0.3">
-        <a-text id="chart-code-text" value="[ TRENCH DEPTH CODE: 4 - 2 - 7 ]" color="#00ffaa" align="center" position="0 0 0.01" scale="0.65 0.65 0.65" visible="false" material="emissive: #00ffaa; emissiveIntensity: 0.7"></a-text>
-      </a-plane>
-    </a-entity>
+        <!-- PUZZLE 2: Chemical Mixer -->
+        <a-cylinder id="chemical-mixer" class="interactive" position="5 1 -3" 
+                    radius="0.8" height="1.5" material="color: #1a472a; metalness: 0.6; roughness: 0.4;">
+        </a-cylinder>
+        
+        <a-text value="MIXER" position="5 2.2 -3" scale="1.5 1.5 1.5"
+                color="#00ff00" align="center"></a-text>
 
-    <!-- ===== OBJECT 4: SUBMARINE HATCH CONTROL PANEL ===== -->
-    <a-entity id="keypad-panel" position="2.2 2.2 -6.85">
-      <a-box width="1.3" height="2" depth="0.12" color="#0d2331" material="metalness: 0.6"></a-box>
-      <!-- Display Screen -->
-      <a-plane position="0 0.6 0.07" width="1.1" height="0.45" color="#030b12">
-        <a-text id="keypad-display" value="LOCKED" color="#ff4466" align="center" position="0 0 0.01" scale="0.75 0.75 0.75"></a-text>
-      </a-plane>
+        <!-- Chemical Container A -->
+        <a-box id="chemical-a" class="interactive" position="3 1 -2" width="0.6" height="1.2" depth="0.6"
+               material="color: #ff6b9d; metalness: 0.7; roughness: 0.3;">
+        </a-box>
+        
+        <a-text value="RED CHEMICAL" position="3 2 -2" scale="1 1 1"
+                color="#ffff00" align="center"></a-text>
 
-      <!-- Keypad Buttons -->
-      <a-box class="clickable btn-num" data-val="1" position="-0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="1" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="2" position="0 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="2" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="3" position="0.35 0.1 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="3" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="4" position="-0.35 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="4" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="5" position="0 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="5" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="6" position="0.35 -0.2 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="6" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="7" position="-0.35 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="7" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="8" position="0 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="8" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-      <a-box class="clickable btn-num" data-val="9" position="0.35 -0.5 0.07" width="0.22" height="0.22" depth="0.05" color="#1b3b52"><a-text value="9" align="center" position="0 0 0.03" scale="0.45 0.45 0.45" color="#00d2ff"></a-text></a-box>
-    </a-entity>
+        <!-- Chemical Container B -->
+        <a-box id="chemical-b" class="interactive" position="7 1 -2" width="0.6" height="1.2" depth="0.6"
+               material="color: #00d9ff; metalness: 0.7; roughness: 0.3;">
+        </a-box>
+        
+        <a-text value="BLUE CHEMICAL" position="7 2 -2" scale="1 1 1"
+                color="#ffff00" align="center"></a-text>
 
-    <!-- ===== ESCAPE HATCH DOORS ===== -->
-    <a-entity id="exit-door-group" position="-1.8 0 -6.85">
-      <a-box position="0 2.4 0" width="2.6" height="0.2" depth="0.25" color="#0077b6" material="emissive: #0077b6; emissiveIntensity: 0.4"></a-box>
-      <a-box position="-1.2 1.2 0" width="0.2" height="2.4" depth="0.2" color="#1b3b52"></a-box>
-      <a-box position="1.2 1.2 0" width="0.2" height="2.4" depth="0.2" color="#1b3b52"></a-box>
-      
-      <a-box id="door-left" position="-0.55 1.2 0" width="1.1" height="2.2" depth="0.06" color="#0d2331" material="metalness: 0.9">
-        <a-box position="0.45 0 0.04" width="0.06" height="2" depth="0.03" color="#00d2ff" material="emissive: #00d2ff; emissiveIntensity: 0.5"></a-box>
-      </a-box>
-      <a-box id="door-right" position="0.55 1.2 0" width="1.1" height="2.2" depth="0.06" color="#0d2331" material="metalness: 0.9">
-        <a-box position="-0.45 0 0.04" width="0.06" height="2" depth="0.03" color="#00d2ff" material="emissive: #00d2ff; emissiveIntensity: 0.5"></a-box>
-      </a-box>
-    </a-entity>
+        <!-- PUZZLE 3: Radiation Shield -->
+        <a-sphere id="radiation-source" position="-5 3 5" radius="1"
+                   material="color: #ffff00; emissive: #ffff00; emissiveIntensity: 0.8;">
+        </a-sphere>
+        
+        <a-text value="RADIATION" position="-5 4.5 5" scale="1.5 1.5 1.5"
+                color="#ff0000" align="center"></a-text>
 
-  </a-scene>
+        <!-- Shield Control Panel -->
+        <a-box id="shield-control" class="interactive" position="-5 2 2" width="1.5" height="2" depth="0.3"
+               material="color: #4a4a4a; metalness: 0.8; roughness: 0.2;">
+        </a-box>
+        
+        <a-text value="SHIELD CONTROL" position="-5 3.2 1.85" scale="1 1 1"
+                color="#00ff00" align="center"></a-text>
 
-  <!-- Game Logic Script -->
-  <script>
-    const gameState = {
-      hasValve: false,
-      lockerOpen: false,
-      hasScanner: false,
-      sonarActive: false,
-      enteredCode: "",
-      targetCode: "427",
-      isUnlocked: false
-    };
+        <!-- CLUE: Computer Terminal -->
+        <a-box id="computer" position="8 2.5 8" width="1.5" height="1.5" depth="0.3"
+               material="color: #000000; metalness: 0.9; roughness: 0.1;">
+        </a-box>
+        
+        <a-plane id="screen" position="8 2.5 7.85" width="1.3" height="1.3"
+                 material="color: #001a00; emissive: #001a00;">
+        </a-plane>
+        
+        <a-text id="computer-text" value="NO ENTRY UNTIL:\n- DOOR UNLOCKED\n- CHEMICALS MIXED\n- RADIATION SAFE" 
+                position="8 2.5 7.8" scale="0.8 0.8 0.8"
+                color="#00ff00" align="center" baseline="center"></a-text>
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(freq, duration) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + (duration / 1000));
-    }
+        <!-- Decorative Elements -->
+        <a-box position="-3 1 3" width="2" height="2" depth="2"
+               material="color: #2a5a4a; metalness: 0.6; roughness: 0.4;">
+        </a-box>
+        
+        <a-cylinder position="6 1 6" radius="0.5" height="3"
+                    material="color: #1a3a5a; metalness: 0.7; roughness: 0.3;">
+        </a-cylinder>
 
-    function updateHUD(text) {
-      if (text) document.getElementById('objective').innerText = text;
-      
-      const stValve = document.getElementById('st-valve');
-      const stLocker = document.getElementById('st-locker');
-      const stLight = document.getElementById('st-light');
-      const stDoor = document.getElementById('st-door');
+        <!-- Lighting Effects -->
+        <a-light type="point" color="#ff6b9d" intensity="0.6" position="3 2 -2"></a-light>
+        <a-light type="point" color="#00d9ff" intensity="0.6" position="7 2 -2"></a-light>
+        <a-light type="point" color="#ffff00" intensity="0.8" position="-5 4 5"></a-light>
 
-      if (gameState.hasValve) { stValve.innerText = "YES"; stValve.className = "active"; }
-      if (gameState.lockerOpen) { stLocker.innerText = "OPEN"; stLocker.className = "active"; }
-      if (gameState.hasScanner) { stLight.innerText = "YES"; stLight.className = "active"; }
-      if (gameState.isUnlocked) { stDoor.innerText = "UNLOCKED"; stDoor.className = "active"; }
-    }
+    </a-scene>
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const valve = document.getElementById('valve');
-      const lockerDoor = document.getElementById('locker-door');
-      const sonar = document.getElementById('sonar');
-      const chartCodeText = document.getElementById('chart-code-text');
-      const keypadBtns = document.querySelectorAll('.btn-num');
-      const keypadDisplay = document.getElementById('keypad-display');
+    <!-- JavaScript Logic -->
+    <script>
+        // ============ GAME STATE ============
+        const gameState = {
+            doorUnlocked: false,
+            chemicalsMixed: false,
+            radiationSafe: false,
+            puzzlesSolved: 0,
+            keypadAttempts: 0,
+            chemicalA_used: false,
+            chemicalB_used: false,
+            shieldActivated: false,
+            gameWon: false
+        };
 
-      valve.addEventListener('click', () => {
-        if (!gameState.hasValve) {
-          gameState.hasValve = true;
-          playBeep(550, 150);
-          valve.setAttribute('visible', 'false');
-          valve.classList.remove('clickable');
-          updateHUD("2. Brass Valve acquired! Use it to unlock the Airlock Locker on the left wall.");
+        // ============ DOM ELEMENTS ============
+        const doorElement = document.getElementById('exit-door');
+        const keypadElement = document.getElementById('keypad');
+        const chemicalMixerElement = document.getElementById('chemical-mixer');
+        const chemicalAElement = document.getElementById('chemical-a');
+        const chemicalBElement = document.getElementById('chemical-b');
+        const shieldControlElement = document.getElementById('shield-control');
+        const radiationElement = document.getElementById('radiation-source');
+        const statusMessage = document.getElementById('status-message');
+        const statusSpan = document.getElementById('status');
+        const puzzleCountSpan = document.getElementById('puzzle-count');
+        const doorStatusSpan = document.getElementById('door-status');
+        const chemicalStatusSpan = document.getElementById('chemical-status');
+        const radiationStatusSpan = document.getElementById('radiation-status');
+
+        // ============ HELPER FUNCTIONS ============
+        
+        /**
+         * Display a message to the player
+         * @param {string} message - The message to display
+         * @param {number} duration - Duration to show message in milliseconds
+         */
+        function showMessage(message, duration = 3000) {
+            statusMessage.textContent = message;
+            statusMessage.style.display = 'block';
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, duration);
         }
-      });
 
-      lockerDoor.addEventListener('click', () => {
-        if (gameState.hasValve && !gameState.lockerOpen) {
-          gameState.lockerOpen = true;
-          playBeep(750, 300);
-          lockerDoor.setAttribute('animation', 'property: rotation; to: 0 -115 0; dur: 1000; easing: easeOutQuad');
-          document.getElementById('locker-status').setAttribute('value', 'OPEN');
-          document.getElementById('locker-status').setAttribute('color', '#00ffaa');
-          sonar.setAttribute('visible', 'true');
-          updateHUD("3. Locker open! Retrieve the Sonar Scanner from inside.");
-        } else if (!gameState.hasValve) {
-          playBeep(200, 200);
-          updateHUD("Locker sealed! Collect the Brass Valve first.");
+        /**
+         * Update the HUD display
+         */
+        function updateHUD() {
+            statusSpan.textContent = gameState.gameWon ? 'ESCAPED!' : 'IN PROGRESS';
+            puzzleCountSpan.textContent = `${gameState.puzzlesSolved}/3`;
+            doorStatusSpan.textContent = gameState.doorUnlocked ? 'UNLOCKED' : 'LOCKED';
+            doorStatusSpan.className = gameState.doorUnlocked ? 'puzzle-solved' : '';
+            
+            chemicalStatusSpan.textContent = gameState.chemicalsMixed ? 'MIXED' : 'NOT MIXED';
+            chemicalStatusSpan.className = gameState.chemicalsMixed ? 'puzzle-solved' : '';
+            
+            radiationStatusSpan.textContent = gameState.radiationSafe ? 'SAFE' : 'UNSAFE';
+            radiationStatusSpan.className = gameState.radiationSafe ? 'puzzle-solved' : '';
         }
-      });
 
-      sonar.addEventListener('click', () => {
-        if (gameState.lockerOpen && !gameState.hasScanner) {
-          gameState.hasScanner = true;
-          playBeep(650, 200);
-          sonar.setAttribute('visible', 'false');
-          sonar.classList.remove('clickable');
-          
-          gameState.sonarActive = true;
-          chartCodeText.setAttribute('visible', 'true');
-          keypadDisplay.setAttribute('value', '---');
-          keypadDisplay.setAttribute('color', '#00d2ff');
-
-          updateHUD("4. Sonar Scanner active! Read the trench depth code (4-2-7) on the front wall chart, then enter it into the hatch control panel.");
-        }
-      });
-
-      keypadBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (!gameState.hasScanner) {
-            playBeep(150, 200);
-            updateHUD("Panel unpowered! Collect the Sonar Scanner first.");
-            return;
-          }
-
-          if (gameState.isUnlocked) return;
-
-          const val = btn.getAttribute('data-val');
-          playBeep(450, 100);
-          
-          gameState.enteredCode += val;
-          keypadDisplay.setAttribute('value', gameState.enteredCode);
-
-          if (gameState.enteredCode.length === 3) {
-            if (gameState.enteredCode === gameState.targetCode) {
-              gameState.isUnlocked = true;
-              playBeep(900, 500);
-              keypadDisplay.setAttribute('value', 'OPEN');
-              keypadDisplay.setAttribute('color', '#00ffaa');
-              updateHUD("Hatch Unlocked! Escape sequence initiated.");
-              
-              const doorLeft = document.getElementById('door-left');
-              const doorRight = document.getElementById('door-right');
-              doorLeft.setAttribute('animation', 'property: position; to: -1.6 1.2 0; dur: 2000; easing: easeOutQuad');
-              doorRight.setAttribute('animation', 'property: position; to: 1.6 1.2 0; dur: 2000; easing: easeOutQuad');
-
-              setTimeout(() => {
-                document.getElementById('win-screen').style.display = 'flex';
-              }, 2500);
-            } else {
-              playBeep(180, 400);
-              keypadDisplay.setAttribute('value', 'ERR');
-              keypadDisplay.setAttribute('color', '#ff4466');
-              setTimeout(() => {
-                gameState.enteredCode = "";
-                keypadDisplay.setAttribute('value', '---');
-                keypadDisplay.setAttribute('color', '#00d2ff');
-              }, 1000);
+        /**
+         * Check if all puzzles are solved and open the door
+         */
+        function checkWinCondition() {
+            if (gameState.doorUnlocked && gameState.chemicalsMixed && gameState.radiationSafe) {
+                completeGame();
             }
-          }
-        });
-      });
+        }
 
-      document.querySelectorAll('.clickable').forEach(el => {
-        el.addEventListener('mouseenter', () => el.setAttribute('scale', '1.1 1.1 1.1'));
-        el.addEventListener('mouseleave', () => el.setAttribute('scale', '1 1 1'));
-      });
-    });
-  </script>
+        /**
+         * Complete the game when player escapes
+         */
+        function completeGame() {
+            gameState.gameWon = true;
+            gameState.gameWon = true;
+            showMessage('🎉 ESCAPE SUCCESSFUL! 🎉\nYou have escaped The Laboratory!', 5000);
+            doorElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00; emissiveIntensity: 0.5;');
+            updateHUD();
+        }
+
+        // ============ PUZZLE 1: KEYPAD (Door Lock) ============
+        keypadElement.addEventListener('click', function() {
+            if (gameState.doorUnlocked) {
+                showMessage('Door is already unlocked!');
+                return;
+            }
+
+            // Random code for this playthrough (can be changed to fixed)
+            const correctCode = '1234';
+            gameState.keypadAttempts++;
+
+            // Simulate keypad interaction
+            const userCode = prompt('Enter the door code (Hint: Look for clues!)');
+            
+            if (userCode === correctCode) {
+                gameState.doorUnlocked = true;
+                gameState.puzzlesSolved++;
+                showMessage('✓ DOOR UNLOCKED!\nCode accepted: ' + correctCode);
+                keypadElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00;');
+                updateHUD();
+                checkWinCondition();
+            } else {
+                showMessage('✗ INCORRECT CODE\nAttempt ' + gameState.keypadAttempts + '\nTry again!');
+            }
+        });
+
+        // ============ PUZZLE 2: Chemical Mixer ============
+        chemicalAElement.addEventListener('click', function() {
+            if (gameState.chemicalA_used) {
+                showMessage('Red chemical already used in mixer!');
+                return;
+            }
+            gameState.chemicalA_used = true;
+            showMessage('Added RED CHEMICAL to mixer');
+            chemicalAElement.setAttribute('material', 'color: #660000; metalness: 0.9;');
+            checkChemicalMix();
+        });
+
+        chemicalBElement.addEventListener('click', function() {
+            if (gameState.chemicalB_used) {
+                showMessage('Blue chemical already used in mixer!');
+                return;
+            }
+            gameState.chemicalB_used = true;
+            showMessage('Added BLUE CHEMICAL to mixer');
+            chemicalBElement.setAttribute('material', 'color: #003366; metalness: 0.9;');
+            checkChemicalMix();
+        });
+
+        /**
+         * Check if both chemicals have been added to mixer
+         */
+        function checkChemicalMix() {
+            if (gameState.chemicalA_used && gameState.chemicalB_used && !gameState.chemicalsMixed) {
+                gameState.chemicalsMixed = true;
+                gameState.puzzlesSolved++;
+                showMessage('✓ CHEMICALS MIXED!\nPurple solution created successfully!');
+                chemicalMixerElement.setAttribute('material', 'color: #8b00ff; emissive: #8b00ff; emissiveIntensity: 0.6;');
+                updateHUD();
+                checkWinCondition();
+            }
+        }
+
+        // ============ PUZZLE 3: Radiation Shield ============
+        shieldControlElement.addEventListener('click', function() {
+            if (gameState.radiationSafe) {
+                showMessage('Radiation shield already activated!');
+                return;
+            }
+
+            // Simple yes/no question to test understanding
+            const userAnswer = prompt('Enter shield activation code (Hint: How many puzzle clues did you find?)\nAnswer should be a number.');
+            
+            if (userAnswer === '3' || userAnswer === 'three') {
+                gameState.radiationSafe = true;
+                gameState.shieldActivated = true;
+                gameState.puzzlesSolved++;
+                showMessage('✓ SHIELD ACTIVATED!\nRadiation levels normalized!');
+                shieldControlElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00;');
+                radiationElement.setAttribute('material', 'color: #00aa00; emissive: #00aa00; emissiveIntensity: 0.4;');
+                updateHUD();
+                checkWinCondition();
+            } else {
+                showMessage('✗ INCORRECT ACTIVATION CODE\nTry thinking about what you\'ve seen...');
+            }
+        });
+
+        // ============ EXIT DOOR INTERACTION ============
+        doorElement.addEventListener('click', function() {
+            if (gameState.gameWon) {
+                showMessage('You have successfully escaped!');
+            } else if (gameState.doorUnlocked) {
+                if (gameState.chemicalsMixed && gameState.radiationSafe) {
+                    completeGame();
+                } else {
+                    showMessage('Door is open, but you haven\'t solved all puzzles yet!\nAll systems must be operational to escape.');
+                }
+            } else {
+                showMessage('✗ DOOR LOCKED\nYou need to enter the correct keypad code!');
+            }
+        });
+
+        // ============ INITIALIZATION ============
+        function initializeGame() {
+            console.log('The Laboratory - VR Escape Room Initialized');
+            updateHUD();
+            showMessage('WELCOME TO THE LABORATORY\n\nSolve all puzzles to escape!\nGood luck!', 5000);
+        }
+
+        // Start game when page loads
+        window.addEventListener('load', initializeGame);
+    </script>
 </body>
 </html>
