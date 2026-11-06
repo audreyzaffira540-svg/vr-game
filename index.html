@@ -1,412 +1,575 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Laboratory - VR Escape Room</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-        
-        #hud {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 999;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border: 2px solid #00ff00;
-            border-radius: 5px;
-            font-size: 14px;
-            max-width: 300px;
-        }
-        
-        #status-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border: 3px solid #00ff00;
-            border-radius: 5px;
-            font-size: 20px;
-            text-align: center;
-            display: none;
-            min-width: 400px;
-        }
-        
-        #instructions {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 999;
-            color: #ffff00;
-            font-family: Arial, sans-serif;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px 30px;
-            border: 2px solid #ffff00;
-            border-radius: 5px;
-            font-size: 12px;
-            text-align: center;
-        }
-        
-        .puzzle-solved {
-            color: #00ff00 !important;
-        }
-        
-        .warning {
-            color: #ff0000 !important;
-        }
-    </style>
+  <meta charset="utf-8">
+  <title>The Lost Observatory - VR Escape Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 <body>
-    <!-- HUD Display -->
-    <div id="hud">
-        <div>STATUS: <span id="status">INITIALIZING</span></div>
-        <div>PUZZLES SOLVED: <span id="puzzle-count">0/3</span></div>
-        <div style="margin-top: 10px; font-size: 12px;">
-            <div>Door Lock: <span id="door-status">LOCKED</span></div>
-            <div>Chemicals: <span id="chemical-status">NOT MIXED</span></div>
-            <div>Radiation: <span id="radiation-status">UNSAFE</span></div>
-        </div>
-    </div>
-    
-    <!-- Status Message -->
-    <div id="status-message"></div>
-    
-    <!-- Instructions -->
-    <div id="instructions">
-        Click on objects to interact. Look for clues and solve puzzles to escape!
-    </div>
 
-    <!-- A-Frame Scene -->
-    <a-scene background="color: #1a1a2e" fog="type: linear; color: #1a1a2e; far: 100">
-        
-        <!-- Camera with Raycaster for Interaction -->
-        <a-entity id="camera" camera="userHeight: 1.6" position="0 0 5" look-controls wasd-controls>
-            <a-entity cursor="fuse: true; fuseTimeout: 2000" 
-                      position="0 0 -1"
-                      geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                      material="color: #4CAF50; shader: flat">
-            </a-entity>
-            <a-entity raycaster="objects: .interactive" line="color: #4CAF50"></a-entity>
-        </a-entity>
+<a-scene id="scene" cursor="rayOrigin: mouse" raycaster="objects: .clickable; far: 12" background="color: #05060f">
 
-        <!-- LIGHTING -->
-        <a-light type="ambient" color="#4a4a6a" intensity="0.6"></a-light>
-        <a-light type="directional" color="#ffffff" intensity="0.8" position="5 10 5"></a-light>
+  <!-- ================= LIGHTING ================= -->
+  <!-- The room starts dim. Turning on the desk lamp (Puzzle 1) brightens it. -->
+  <a-entity id="ambient" light="type: ambient; color: #8a93c0; intensity: 0.3"></a-entity>
+  <a-entity light="type: directional; color: #99a; intensity: 0.15" position="1 4 2"></a-entity>
+  <a-entity id="lampLight" light="type: point; color: #ffd9a0; intensity: 0; distance: 14; decay: 1" position="-3.0 1.8 -0.8"></a-entity>
+  <a-entity id="exitLight" light="type: point; color: #fff3c4; intensity: 0; distance: 8" position="0 1.3 -3.4"></a-entity>
 
-        <!-- FLOOR -->
-        <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="20" height="20" 
-                  material="color: #2a2a4e; metalness: 0.6; roughness: 0.4;">
-        </a-plane>
+  <!-- ================= ROOM SHELL (8 x 4 x 8) ================= -->
+  <a-plane rotation="-90 0 0" width="8" height="8" color="#2b2b33"></a-plane>
+  <a-plane position="0 4 0" rotation="90 0 0" width="8" height="8" color="#12121c"></a-plane>
+  <a-plane position="0 2 -4" width="8" height="4" color="#3b4260"></a-plane>                    <!-- north -->
+  <a-plane position="0 2 4" rotation="0 180 0" width="8" height="4" color="#3b4260"></a-plane>  <!-- south -->
+  <a-plane position="4 2 0" rotation="0 -90 0" width="8" height="4" color="#343a58"></a-plane>  <!-- east -->
+  <a-plane position="-4 2 0" rotation="0 90 0" width="8" height="4" color="#343a58"></a-plane>  <!-- west -->
+  <a-box position="0 0.05 0" width="3" height="0.02" depth="3" color="#3d2f54"></a-box>          <!-- rug -->
 
-        <!-- WALLS -->
-        <a-plane position="-10 5 0" rotation="0 0 0" width="20" height="10"
-                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
-        </a-plane>
-        
-        <a-plane position="10 5 0" rotation="0 0 0" width="20" height="10"
-                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
-        </a-plane>
-        
-        <a-plane position="0 5 -10" rotation="0 0 0" width="20" height="10"
-                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
-        </a-plane>
+  <!-- ================= NORTH WALL: EXIT DOOR, KEYPAD, CLOCK ================= -->
+  <a-plane position="0 1.3 -3.97" width="1.6" height="2.6" material="shader: flat; color: #fff3c4"></a-plane>
+  <a-text value="EXIT" align="center" position="0 2.8 -3.95" width="3" color="#7CFC9A"></a-text>
 
-        <!-- CEILING -->
-        <a-plane position="0 10 0" rotation="90 0 0" width="20" height="20"
-                  material="color: #0f3460; metalness: 0.7; roughness: 0.3;">
-        </a-plane>
+  <!-- Door: hinge on the left edge -->
+  <a-entity id="door" position="-0.8 1.3 -3.92" animation__open="property: rotation; to: 0 -100 0; dur: 1800; easing: easeInOutQuad; startEvents: opendoor">
+    <a-box position="0.8 0 0" width="1.6" height="2.6" depth="0.08" color="#5a3d2b"></a-box>
+    <a-box position="0.8 0 0.045" width="1.2" height="2.1" depth="0.02" color="#4a3023"></a-box>
+    <a-sphere position="1.35 0 0.08" radius="0.06" color="#c9a227"></a-sphere>
+  </a-entity>
 
-        <!-- DOOR (Exit) -->
-        <a-box id="exit-door" class="interactive" position="-9.8 4 -9.8" width="2" height="5" depth="0.3"
-               material="color: #8b0000; metalness: 0.8; roughness: 0.2;">
-        </a-box>
-        
-        <a-text id="door-label" value="EXIT DOOR" position="-9.8 5.5 -9.5" scale="2 2 2"
-                color="#ffff00" align="center"></a-text>
+  <!-- Keypad (Puzzle 2). Buttons are created in JavaScript. -->
+  <a-entity id="keypad" position="1.6 1.4 -3.93">
+    <a-box width="0.8" height="1.4" depth="0.06" color="#1d1d24"></a-box>
+    <a-plane position="0 0.52 0.035" width="0.66" height="0.2" color="#000"></a-plane>
+    <a-text id="keypadDisplay" value="_ _ _" align="center" position="0 0.52 0.04" width="2.4" color="#7CFC9A"></a-text>
+  </a-entity>
 
-        <!-- PUZZLE 1: KEYPAD (for Door Lock) -->
-        <a-box id="keypad" class="interactive" position="-8 4 -9.6" width="1.5" height="2" depth="0.2"
-               material="color: #222222; metalness: 0.9; roughness: 0.1;">
-        </a-box>
-        
-        <a-text value="KEYPAD" position="-8 4.7 -9.4" scale="1.5 1.5 1.5"
-                color="#00ff00" align="center"></a-text>
+  <!-- Wall clock: stopped at 4:17 -->
+  <a-entity id="clock" position="-2.5 2.5 -3.95">
+    <a-circle radius="0.55" color="#f2efe6" data-label="Clock"></a-circle>
+    <a-ring radius-inner="0.55" radius-outer="0.62" position="0 0 0.005" color="#8a6d3b"></a-ring>
+    <a-text value="12" align="center" position="0 0.43 0.01" width="1.4" color="#222"></a-text>
+    <a-text value="3"  align="center" position="0.43 0 0.01" width="1.4" color="#222"></a-text>
+    <a-text value="6"  align="center" position="0 -0.43 0.01" width="1.4" color="#222"></a-text>
+    <a-text value="9"  align="center" position="-0.43 0 0.01" width="1.4" color="#222"></a-text>
+    <a-entity rotation="0 0 -128.5"><a-box position="0 0.14 0.02" width="0.04" height="0.28" depth="0.01" color="#111"></a-box></a-entity>
+    <a-entity rotation="0 0 -102"><a-box position="0 0.21 0.03" width="0.025" height="0.42" depth="0.01" color="#a00"></a-box></a-entity>
+    <a-circle radius="0.035" position="0 0 0.04" color="#111"></a-circle>
+  </a-entity>
 
-        <!-- PUZZLE 2: Chemical Mixer -->
-        <a-cylinder id="chemical-mixer" class="interactive" position="5 1 -3" 
-                    radius="0.8" height="1.5" material="color: #1a472a; metalness: 0.6; roughness: 0.4;">
-        </a-cylinder>
-        
-        <a-text value="MIXER" position="5 2.2 -3" scale="1.5 1.5 1.5"
-                color="#00ff00" align="center"></a-text>
+  <!-- ================= EAST WALL: COLOUR CONSOLE (Puzzle 1) ================= -->
+  <a-plane position="3.97 2.1 -0.95" rotation="0 -90 0" width="2.6" height="1.3" color="#0b1330"></a-plane>
+  <a-entity id="hiddenMessage" position="3.95 2.1 -0.95" rotation="0 -90 0" visible="false">
+    <a-text value="WRITTEN IN GLOWING INK" align="center" position="0 0.45 0" width="2.2" color="#9fe8ff"></a-text>
+    <a-text value="ROSE   then   OCEAN   then   LEAF   then   SUN" align="center" position="0 0 0" width="2.4" color="#ffffff" wrap-count="26"></a-text>
+    <a-text value="Match each word to its colour." align="center" position="0 -0.45 0" width="2" color="#9fe8ff"></a-text>
+  </a-entity>
 
-        <!-- Chemical Container A -->
-        <a-box id="chemical-a" class="interactive" position="3 1 -2" width="0.6" height="1.2" depth="0.6"
-               material="color: #ff6b9d; metalness: 0.7; roughness: 0.3;">
-        </a-box>
-        
-        <a-text value="RED CHEMICAL" position="3 2 -2" scale="1 1 1"
-                color="#ffff00" align="center"></a-text>
+  <a-box position="3.45 0.5 -0.95" width="0.7" height="1" depth="2.2" color="#2a2a33"></a-box>
+  <a-box position="3.45 1.35 -0.95" width="0.05" height="0.05" depth="2.0" color="#111"></a-box>
+  <a-sphere id="seqLight0" position="3.45 1.45 -1.7" radius="0.07" material="color: #333; emissive: #000"></a-sphere>
+  <a-sphere id="seqLight1" position="3.45 1.45 -1.2" radius="0.07" material="color: #333; emissive: #000"></a-sphere>
+  <a-sphere id="seqLight2" position="3.45 1.45 -0.7" radius="0.07" material="color: #333; emissive: #000"></a-sphere>
+  <a-sphere id="seqLight3" position="3.45 1.45 -0.2" radius="0.07" material="color: #333; emissive: #000"></a-sphere>
 
-        <!-- Chemical Container B -->
-        <a-box id="chemical-b" class="interactive" position="7 1 -2" width="0.6" height="1.2" depth="0.6"
-               material="color: #00d9ff; metalness: 0.7; roughness: 0.3;">
-        </a-box>
-        
-        <a-text value="BLUE CHEMICAL" position="7 2 -2" scale="1 1 1"
-                color="#ffff00" align="center"></a-text>
+  <a-cylinder class="clickable colour-btn" data-colour="red" data-label="Red button" position="3.45 1.04 -1.7" radius="0.14" height="0.08"
+    material="color: #e53935; emissive: #e53935; emissiveIntensity: 0.35"
+    animation__press="property: scale; from: 1 1 1; to: 1.25 0.6 1.25; dur: 120; dir: alternate; loop: 1; startEvents: press"></a-cylinder>
+  <a-cylinder class="clickable colour-btn" data-colour="blue" data-label="Blue button" position="3.45 1.04 -1.2" radius="0.14" height="0.08"
+    material="color: #1e88e5; emissive: #1e88e5; emissiveIntensity: 0.35"
+    animation__press="property: scale; from: 1 1 1; to: 1.25 0.6 1.25; dur: 120; dir: alternate; loop: 1; startEvents: press"></a-cylinder>
+  <a-cylinder class="clickable colour-btn" data-colour="green" data-label="Green button" position="3.45 1.04 -0.7" radius="0.14" height="0.08"
+    material="color: #43a047; emissive: #43a047; emissiveIntensity: 0.35"
+    animation__press="property: scale; from: 1 1 1; to: 1.25 0.6 1.25; dur: 120; dir: alternate; loop: 1; startEvents: press"></a-cylinder>
+  <a-cylinder class="clickable colour-btn" data-colour="yellow" data-label="Yellow button" position="3.45 1.04 -0.2" radius="0.14" height="0.08"
+    material="color: #fdd835; emissive: #fdd835; emissiveIntensity: 0.35"
+    animation__press="property: scale; from: 1 1 1; to: 1.25 0.6 1.25; dur: 120; dir: alternate; loop: 1; startEvents: press"></a-cylinder>
 
-        <!-- PUZZLE 3: Radiation Shield -->
-        <a-sphere id="radiation-source" position="-5 3 5" radius="1"
-                   material="color: #ffff00; emissive: #ffff00; emissiveIntensity: 0.8;">
-        </a-sphere>
-        
-        <a-text value="RADIATION" position="-5 4.5 5" scale="1.5 1.5 1.5"
-                color="#ff0000" align="center"></a-text>
+  <!-- ================= WEST WALL: DESK + LAMP, CABINET ================= -->
+  <a-box position="-3.4 0.4 -0.8" width="1" height="0.8" depth="1.8" color="#6b4a2b"></a-box>
 
-        <!-- Shield Control Panel -->
-        <a-box id="shield-control" class="interactive" position="-5 2 2" width="1.5" height="2" depth="0.3"
-               material="color: #4a4a4a; metalness: 0.8; roughness: 0.2;">
-        </a-box>
-        
-        <a-text value="SHIELD CONTROL" position="-5 3.2 1.85" scale="1 1 1"
-                color="#00ff00" align="center"></a-text>
+  <a-entity id="lamp" class="clickable" data-label="Desk lamp" position="-3.4 0.8 -0.8">
+    <a-cylinder radius="0.12" height="0.04" position="0 0.02 0" color="#222"></a-cylinder>
+    <a-cylinder radius="0.015" height="0.4" position="0 0.22 0" color="#222"></a-cylinder>
+    <a-cone radius-bottom="0.16" radius-top="0.04" height="0.2" position="0 0.5 0" material="color: #c9a227; emissive: #6b5200; emissiveIntensity: 0.4"></a-cone>
+  </a-entity>
 
-        <!-- CLUE: Computer Terminal -->
-        <a-box id="computer" position="8 2.5 8" width="1.5" height="1.5" depth="0.3"
-               material="color: #000000; metalness: 0.9; roughness: 0.1;">
-        </a-box>
-        
-        <a-plane id="screen" position="8 2.5 7.85" width="1.3" height="1.3"
-                 material="color: #001a00; emissive: #001a00;">
-        </a-plane>
-        
-        <a-text id="computer-text" value="NO ENTRY UNTIL:\n- DOOR UNLOCKED\n- CHEMICALS MIXED\n- RADIATION SAFE" 
-                position="8 2.5 7.8" scale="0.8 0.8 0.8"
-                color="#00ff00" align="center" baseline="center"></a-text>
+  <!-- Cabinet with a locked drawer -->
+  <a-entity id="cabinet" position="-3.6 0 1.8">
+    <a-box position="0 0.7 0" width="0.8" height="1.4" depth="1.2" color="#4e3a2a"></a-box>
+    <a-entity id="drawer" class="clickable" data-label="Drawer" position="0.4 0.9 0"
+      animation__slide="property: position; to: 0.9 0.9 0; dur: 700; easing: easeOutQuad; startEvents: slide">
+      <a-box width="0.06" height="0.4" depth="1" color="#6b4a2b"></a-box>
+      <a-box position="-0.2 -0.15 0" width="0.4" height="0.08" depth="0.9" color="#5a3d22"></a-box>
+      <a-sphere id="drawerLatch" position="0.06 0 0" radius="0.05" material="color: #d32f2f; emissive: #d32f2f; emissiveIntensity: 0.5"></a-sphere>
+    </a-entity>
+    <!-- Brass key rests on the tray once the drawer is open -->
+    <a-entity id="key" data-label="Brass key" position="0.65 0.78 0" visible="false">
+      <a-torus radius="0.05" radius-tubular="0.012" rotation="0 90 0" position="0 0 -0.12" color="#d4af37"></a-torus>
+      <a-box width="0.02" height="0.02" depth="0.22" position="0 0 0.04" color="#d4af37"></a-box>
+      <a-box width="0.02" height="0.05" depth="0.03" position="0 -0.02 0.13" color="#d4af37"></a-box>
+    </a-entity>
+  </a-entity>
 
-        <!-- Decorative Elements -->
-        <a-box position="-3 1 3" width="2" height="2" depth="2"
-               material="color: #2a5a4a; metalness: 0.6; roughness: 0.4;">
-        </a-box>
-        
-        <a-cylinder position="6 1 6" radius="0.5" height="3"
-                    material="color: #1a3a5a; metalness: 0.7; roughness: 0.3;">
-        </a-cylinder>
+  <!-- ================= CHEST (needs the key) ================= -->
+  <a-entity id="chest" class="clickable" data-label="Chest" position="-2.5 0 -3.3">
+    <a-box position="0 0.25 0" width="1" height="0.5" depth="0.6" color="#7b3f1d"></a-box>
+    <a-box position="0 0.32 0.31" width="0.12" height="0.14" depth="0.03" color="#c9a227"></a-box>
+    <a-entity id="chestLid" position="0 0.5 -0.3" animation__open="property: rotation; to: -100 0 0; dur: 800; startEvents: openlid">
+      <a-box position="0 0.075 0.3" width="1" height="0.15" depth="0.6" color="#8d4a22"></a-box>
+    </a-entity>
+  </a-entity>
+  <a-entity id="chestNote" position="-2.5 1.15 -3.9" visible="false">
+    <a-plane width="1.3" height="0.6" color="#f3e7c3"></a-plane>
+    <a-text value="Time stood still when the lights failed.&#10;The door code is that time:&#10;hour, then minutes (no colon)." align="center" position="0 0 0.01" width="1.2" color="#2b1b0b"></a-text>
+  </a-entity>
 
-        <!-- Lighting Effects -->
-        <a-light type="point" color="#ff6b9d" intensity="0.6" position="3 2 -2"></a-light>
-        <a-light type="point" color="#00d9ff" intensity="0.6" position="7 2 -2"></a-light>
-        <a-light type="point" color="#ffff00" intensity="0.8" position="-5 4 5"></a-light>
+  <!-- ================= TELESCOPE (hint object) ================= -->
+  <a-entity id="telescope" class="clickable" data-label="Telescope (hint)" position="0 0 0">
+    <a-cylinder radius="0.02" height="1.5" position="-1.08 0.75 0.5" rotation="0 0 8" color="#222"></a-cylinder>
+    <a-cylinder radius="0.02" height="1.5" position="-1.32 0.75 0.5" rotation="0 0 -8" color="#222"></a-cylinder>
+    <a-cylinder radius="0.02" height="1.5" position="-1.2 0.75 0.62" rotation="-8 0 0" color="#222"></a-cylinder>
+    <a-cylinder radius="0.08" height="1.2" position="-1.2 1.55 0.5" rotation="0 0 55" color="#9aa3b5"></a-cylinder>
+    <a-cylinder radius="0.11" height="0.1" position="-1.55 1.9 0.5" rotation="0 0 55" color="#444"></a-cylinder>
+  </a-entity>
 
-    </a-scene>
+  <!-- ================= PLAYER RIG ================= -->
+  <a-entity id="rig" position="0 0 3" wasd-controls="acceleration: 30" room-bounds>
+    <a-entity id="head" camera look-controls position="0 1.6 0">
 
-    <!-- JavaScript Logic -->
-    <script>
-        // ============ GAME STATE ============
-        const gameState = {
-            doorUnlocked: false,
-            chemicalsMixed: false,
-            radiationSafe: false,
-            puzzlesSolved: 0,
-            keypadAttempts: 0,
-            chemicalA_used: false,
-            chemicalB_used: false,
-            shieldActivated: false,
-            gameWon: false
-        };
+      <!-- HUD: objective (top), hover label (centre), inventory + feedback (bottom) -->
+      <a-plane position="0 0.36 -1" width="1.05" height="0.1" material="color: #000; opacity: 0.55; shader: flat"></a-plane>
+      <a-text id="objective" value="" align="center" position="0 0.36 -0.99" width="0.95" wrap-count="55" color="#ffd966"></a-text>
 
-        // ============ DOM ELEMENTS ============
-        const doorElement = document.getElementById('exit-door');
-        const keypadElement = document.getElementById('keypad');
-        const chemicalMixerElement = document.getElementById('chemical-mixer');
-        const chemicalAElement = document.getElementById('chemical-a');
-        const chemicalBElement = document.getElementById('chemical-b');
-        const shieldControlElement = document.getElementById('shield-control');
-        const radiationElement = document.getElementById('radiation-source');
-        const statusMessage = document.getElementById('status-message');
-        const statusSpan = document.getElementById('status');
-        const puzzleCountSpan = document.getElementById('puzzle-count');
-        const doorStatusSpan = document.getElementById('door-status');
-        const chemicalStatusSpan = document.getElementById('chemical-status');
-        const radiationStatusSpan = document.getElementById('radiation-status');
+      <a-text id="hoverLabel" value="" align="center" position="0 -0.1 -1" width="0.8" color="#ffffff"></a-text>
 
-        // ============ HELPER FUNCTIONS ============
-        
-        /**
-         * Display a message to the player
-         * @param {string} message - The message to display
-         * @param {number} duration - Duration to show message in milliseconds
-         */
-        function showMessage(message, duration = 3000) {
-            statusMessage.textContent = message;
-            statusMessage.style.display = 'block';
-            setTimeout(() => {
-                statusMessage.style.display = 'none';
-            }, duration);
-        }
+      <a-plane position="0 -0.29 -1" width="1.05" height="0.05" material="color: #000; opacity: 0.55; shader: flat"></a-plane>
+      <a-text id="inventoryText" value="Inventory: empty" align="center" position="0 -0.29 -0.99" width="0.95" color="#9fe8ff"></a-text>
+      <a-plane position="0 -0.37 -1" width="1.05" height="0.1" material="color: #000; opacity: 0.55; shader: flat"></a-plane>
+      <a-text id="msg" value="" align="center" position="0 -0.37 -0.99" width="0.95" wrap-count="55" color="#ffffff"></a-text>
 
-        /**
-         * Update the HUD display
-         */
-        function updateHUD() {
-            statusSpan.textContent = gameState.gameWon ? 'ESCAPED!' : 'IN PROGRESS';
-            puzzleCountSpan.textContent = `${gameState.puzzlesSolved}/3`;
-            doorStatusSpan.textContent = gameState.doorUnlocked ? 'UNLOCKED' : 'LOCKED';
-            doorStatusSpan.className = gameState.doorUnlocked ? 'puzzle-solved' : '';
-            
-            chemicalStatusSpan.textContent = gameState.chemicalsMixed ? 'MIXED' : 'NOT MIXED';
-            chemicalStatusSpan.className = gameState.chemicalsMixed ? 'puzzle-solved' : '';
-            
-            radiationStatusSpan.textContent = gameState.radiationSafe ? 'SAFE' : 'UNSAFE';
-            radiationStatusSpan.className = gameState.radiationSafe ? 'puzzle-solved' : '';
-        }
+      <!-- Intro panel -->
+      <a-entity id="introPanel" position="0 0 -1.3">
+        <a-plane width="1.5" height="0.95" material="color: #070b1f; opacity: 0.92; shader: flat"></a-plane>
+        <a-text value="THE LOST OBSERVATORY" align="center" position="0 0.34 0.01" width="1.4" color="#ffd966"></a-text>
+        <a-text value="The power has failed and every door is sealed.&#10;Find the clues, solve the puzzles and enter the&#10;door code to escape before dawn."
+          align="center" position="0 0.1 0.01" width="1.2" color="#ffffff"></a-text>
+        <a-text value="LOOK: move the mouse / turn your head     MOVE: W A S D&#10;INTERACT: click, or stare at an object for 1.5 seconds in VR"
+          align="center" position="0 -0.14 0.01" width="1.1" color="#9fe8ff"></a-text>
+        <a-box id="beginBtn" class="clickable" data-label="Start the game" position="0 -0.33 0.02" width="0.5" height="0.12" depth="0.02" color="#2e7d32"></a-box>
+        <a-text value="BEGIN" align="center" position="0 -0.33 0.04" width="1.2" color="#fff"></a-text>
+      </a-entity>
 
-        /**
-         * Check if all puzzles are solved and open the door
-         */
-        function checkWinCondition() {
-            if (gameState.doorUnlocked && gameState.chemicalsMixed && gameState.radiationSafe) {
-                completeGame();
-            }
-        }
+      <!-- Win panel -->
+      <a-entity id="winPanel" position="0 0 -1.1" visible="false">
+        <a-plane width="1.3" height="0.75" material="color: #06240f; opacity: 0.95; shader: flat"></a-plane>
+        <a-text value="YOU ESCAPED!" align="center" position="0 0.25 0.01" width="1.8" color="#7CFC9A"></a-text>
+        <a-text id="winStats" value="" align="center" position="0 0.02 0.01" width="1.05" color="#ffffff"></a-text>
+        <a-box id="againBtn" data-label="Play again" position="0 -0.27 0.02" width="0.5" height="0.1" depth="0.02" color="#1565c0"></a-box>
+        <a-text value="PLAY AGAIN" align="center" position="0 -0.27 0.04" width="1" color="#fff"></a-text>
+      </a-entity>
+    </a-entity>
 
-        /**
-         * Complete the game when player escapes
-         */
-        function completeGame() {
-            gameState.gameWon = true;
-            gameState.gameWon = true;
-            showMessage('🎉 ESCAPE SUCCESSFUL! 🎉\nYou have escaped The Laboratory!', 5000);
-            doorElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00; emissiveIntensity: 0.5;');
-            updateHUD();
-        }
+    <!-- VR controllers (laser pointer) -->
+    <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 12"></a-entity>
+    <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 12"></a-entity>
+  </a-entity>
 
-        // ============ PUZZLE 1: KEYPAD (Door Lock) ============
-        keypadElement.addEventListener('click', function() {
-            if (gameState.doorUnlocked) {
-                showMessage('Door is already unlocked!');
-                return;
-            }
+</a-scene>
 
-            // Random code for this playthrough (can be changed to fixed)
-            const correctCode = '1234';
-            gameState.keypadAttempts++;
+<script>
+/* =========================================================
+   THE LOST OBSERVATORY - game logic
+   ========================================================= */
 
-            // Simulate keypad interaction
-            const userCode = prompt('Enter the door code (Hint: Look for clues!)');
-            
-            if (userCode === correctCode) {
-                gameState.doorUnlocked = true;
-                gameState.puzzlesSolved++;
-                showMessage('✓ DOOR UNLOCKED!\nCode accepted: ' + correctCode);
-                keypadElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00;');
-                updateHUD();
-                checkWinCondition();
-            } else {
-                showMessage('✗ INCORRECT CODE\nAttempt ' + gameState.keypadAttempts + '\nTry again!');
-            }
-        });
+/* ---------- Game data (constants) ---------- */
+const COLOUR_ORDER = ['red', 'blue', 'green', 'yellow'];   // Puzzle 1 answer (ROSE, OCEAN, LEAF, SUN)
+const COLOUR_HEX   = { red: '#e53935', blue: '#1e88e5', green: '#43a047', yellow: '#fdd835' };
+const SECRET_CODE  = '417';                                // Puzzle 2 answer (clock reads 4:17)
 
-        // ============ PUZZLE 2: Chemical Mixer ============
-        chemicalAElement.addEventListener('click', function() {
-            if (gameState.chemicalA_used) {
-                showMessage('Red chemical already used in mixer!');
-                return;
-            }
-            gameState.chemicalA_used = true;
-            showMessage('Added RED CHEMICAL to mixer');
-            chemicalAElement.setAttribute('material', 'color: #660000; metalness: 0.9;');
-            checkChemicalMix();
-        });
+/* ---------- Game state (variables the program remembers) ---------- */
+let gameStarted    = false;   // Boolean
+let lampOn         = false;   // Boolean
+let sequenceIndex  = 0;       // counter: how many colours are correct so far
+let drawerUnlocked = false;   // Boolean
+let drawerOpen     = false;   // Boolean
+let chestOpen      = false;   // Boolean
+let doorOpen       = false;   // Boolean (win condition)
+let enteredCode    = '';      // String typed on the keypad
+let mistakes       = 0;       // counter
+let hintsUsed      = 0;       // counter
+let startTime      = 0;
+const inventory    = [];      // collection (array) of items the player carries
 
-        chemicalBElement.addEventListener('click', function() {
-            if (gameState.chemicalB_used) {
-                showMessage('Blue chemical already used in mixer!');
-                return;
-            }
-            gameState.chemicalB_used = true;
-            showMessage('Added BLUE CHEMICAL to mixer');
-            chemicalBElement.setAttribute('material', 'color: #003366; metalness: 0.9;');
-            checkChemicalMix();
-        });
+/* ---------- Helpers ---------- */
+const $ = (id) => document.getElementById(id);
+const scene = $('scene');
 
-        /**
-         * Check if both chemicals have been added to mixer
-         */
-        function checkChemicalMix() {
-            if (gameState.chemicalA_used && gameState.chemicalB_used && !gameState.chemicalsMixed) {
-                gameState.chemicalsMixed = true;
-                gameState.puzzlesSolved++;
-                showMessage('✓ CHEMICALS MIXED!\nPurple solution created successfully!');
-                chemicalMixerElement.setAttribute('material', 'color: #8b00ff; emissive: #8b00ff; emissiveIntensity: 0.6;');
-                updateHUD();
-                checkWinCondition();
-            }
-        }
+let audioCtx = null;
+function beep(freq, seconds) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    gain.gain.value = 0.05;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + seconds);
+  } catch (e) { /* audio not available: ignore */ }
+}
 
-        // ============ PUZZLE 3: Radiation Shield ============
-        shieldControlElement.addEventListener('click', function() {
-            if (gameState.radiationSafe) {
-                showMessage('Radiation shield already activated!');
-                return;
-            }
+function showMessage(text, type) {
+  const colours = { good: '#7CFC9A', bad: '#ff7b7b', info: '#ffffff' };
+  $('msg').setAttribute('value', text);
+  $('msg').setAttribute('color', colours[type] || colours.info);
+}
 
-            // Simple yes/no question to test understanding
-            const userAnswer = prompt('Enter shield activation code (Hint: How many puzzle clues did you find?)\nAnswer should be a number.');
-            
-            if (userAnswer === '3' || userAnswer === 'three') {
-                gameState.radiationSafe = true;
-                gameState.shieldActivated = true;
-                gameState.puzzlesSolved++;
-                showMessage('✓ SHIELD ACTIVATED!\nRadiation levels normalized!');
-                shieldControlElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00;');
-                radiationElement.setAttribute('material', 'color: #00aa00; emissive: #00aa00; emissiveIntensity: 0.4;');
-                updateHUD();
-                checkWinCondition();
-            } else {
-                showMessage('✗ INCORRECT ACTIVATION CODE\nTry thinking about what you\'ve seen...');
-            }
-        });
+function hasItem(name) {
+  return inventory.includes(name);
+}
 
-        // ============ EXIT DOOR INTERACTION ============
-        doorElement.addEventListener('click', function() {
-            if (gameState.gameWon) {
-                showMessage('You have successfully escaped!');
-            } else if (gameState.doorUnlocked) {
-                if (gameState.chemicalsMixed && gameState.radiationSafe) {
-                    completeGame();
-                } else {
-                    showMessage('Door is open, but you haven\'t solved all puzzles yet!\nAll systems must be operational to escape.');
-                }
-            } else {
-                showMessage('✗ DOOR LOCKED\nYou need to enter the correct keypad code!');
-            }
-        });
+function refreshRaycasters() {
+  document.querySelectorAll('[raycaster]').forEach((el) => {
+    if (el.components && el.components.raycaster) el.components.raycaster.refreshObjects();
+  });
+}
 
-        // ============ INITIALIZATION ============
-        function initializeGame() {
-            console.log('The Laboratory - VR Escape Room Initialized');
-            updateHUD();
-            showMessage('WELCOME TO THE LABORATORY\n\nSolve all puzzles to escape!\nGood luck!', 5000);
-        }
+function setClickable(el, on) {
+  if (on) el.classList.add('clickable');
+  else el.classList.remove('clickable');
+  refreshRaycasters();
+}
 
-        // Start game when page loads
-        window.addEventListener('load', initializeGame);
-    </script>
+function updateInventory() {
+  const text = inventory.length === 0 ? 'Inventory: empty' : 'Inventory: ' + inventory.join(', ');
+  $('inventoryText').setAttribute('value', text);
+}
+
+/* Objective text changes depending on the game state (selection with if / else if / else) */
+function getObjective() {
+  if (!lampOn) {
+    return 'Light up the room. Look for a lamp.';
+  } else if (!drawerUnlocked) {
+    return 'Read the glowing message and use the colour console.';
+  } else if (!drawerOpen) {
+    return 'The latch turned green. Open the cabinet drawer.';
+  } else if (!hasItem('Brass Key')) {
+    return 'Take the key from the drawer.';
+  } else if (!chestOpen) {
+    return 'Use the brass key on the chest.';
+  } else if (!doorOpen) {
+    return 'Work out the 3-digit code and enter it on the keypad.';
+  }
+  return 'Escape through the door!';
+}
+
+function getHint() {
+  if (!lampOn) {
+    return 'A desk lamp sits by the west wall. The room is too dark to see clues.';
+  } else if (!drawerUnlocked) {
+    return 'Invisible ink glows on the east wall. Press the console colours in that order: rose, ocean, leaf, sun.';
+  } else if (!drawerOpen) {
+    return 'The red latch on the cabinet drawer is now green. Click the drawer.';
+  } else if (!hasItem('Brass Key')) {
+    return 'There is something shiny on the drawer tray.';
+  } else if (!chestOpen) {
+    return 'Your key fits the chest below the clock.';
+  } else if (!doorOpen) {
+    return 'Read the note, then look at the clock hands. The hour hand is on 4, the minute hand on 17 minutes.';
+  }
+  return 'Go through the door!';
+}
+
+function updateObjective() {
+  $('objective').setAttribute('value', 'OBJECTIVE: ' + getObjective());
+}
+
+/* ---------- Lighting ---------- */
+function updateLighting() {
+  $('ambient').setAttribute('light', 'intensity', lampOn ? 0.9 : 0.3);
+  $('lampLight').setAttribute('light', 'intensity', lampOn ? 1.2 : 0);
+  $('hiddenMessage').setAttribute('visible', lampOn);
+}
+
+/* ---------- Game flow ---------- */
+function startGame() {
+  if (gameStarted) return;
+  gameStarted = true;
+  startTime = Date.now();
+  $('introPanel').setAttribute('visible', false);
+  setClickable($('beginBtn'), false);
+  updateObjective();
+  showMessage('Find a way to light the room.', 'info');
+  beep(520, 0.12);
+}
+
+function toggleLamp() {
+  lampOn = !lampOn;
+  updateLighting();
+  updateObjective();
+  if (lampOn) {
+    beep(660, 0.12);
+    showMessage('The lamp is on. Glowing writing appears on the east wall!', 'good');
+  } else {
+    beep(300, 0.12);
+    showMessage('The lamp is off. The writing fades.', 'info');
+  }
+}
+
+/* PUZZLE 1: colour sequence */
+function pressColour(colour, buttonEl) {
+  if (drawerUnlocked) {
+    showMessage('The console is already solved.', 'info');
+    return;
+  }
+  buttonEl.emit('press');
+
+  if (colour === COLOUR_ORDER[sequenceIndex]) {
+    $('seqLight' + sequenceIndex).setAttribute('material', { color: COLOUR_HEX[colour], emissive: COLOUR_HEX[colour] });
+    sequenceIndex++;
+    if (sequenceIndex === COLOUR_ORDER.length) {
+      unlockDrawer();
+    } else {
+      beep(600 + sequenceIndex * 100, 0.12);
+      showMessage('Correct! ' + sequenceIndex + ' of ' + COLOUR_ORDER.length + '.', 'good');
+    }
+  } else {
+    mistakes++;
+    sequenceIndex = 0;
+    for (let i = 0; i < COLOUR_ORDER.length; i++) {
+      $('seqLight' + i).setAttribute('material', { color: '#333', emissive: '#000' });
+    }
+    beep(150, 0.3);
+    showMessage('Wrong order. The sequence resets.', 'bad');
+  }
+}
+
+function unlockDrawer() {
+  drawerUnlocked = true;
+  $('drawerLatch').setAttribute('material', { color: '#43a047', emissive: '#43a047' });
+  beep(880, 0.25);
+  showMessage('Click! Somewhere a latch has released.', 'good');
+  updateObjective();
+}
+
+function useDrawer() {
+  if (!drawerUnlocked) {
+    showMessage('The drawer is locked by an electronic latch.', 'bad');
+    beep(150, 0.2);
+  } else if (!drawerOpen) {
+    drawerOpen = true;
+    $('drawer').emit('slide');
+    $('key').setAttribute('visible', true);
+    setClickable($('key'), true);
+    beep(500, 0.15);
+    showMessage('The drawer slides open. A brass key is inside.', 'good');
+    updateObjective();
+  } else {
+    showMessage('The drawer is already open.', 'info');
+  }
+}
+
+function takeKey() {
+  if (!drawerOpen || hasItem('Brass Key')) return;
+  inventory.push('Brass Key');
+  $('key').setAttribute('visible', false);
+  setClickable($('key'), false);
+  updateInventory();
+  updateObjective();
+  beep(760, 0.15);
+  showMessage('You picked up a brass key.', 'good');
+}
+
+function useChest() {
+  if (!hasItem('Brass Key')) {
+    showMessage('The chest is locked. You need a key.', 'bad');
+    beep(150, 0.2);
+  } else if (!chestOpen) {
+    chestOpen = true;
+    $('chestLid').emit('openlid');
+    $('chestNote').setAttribute('visible', true);
+    beep(700, 0.2);
+    showMessage('The chest opens. A note is pinned to the wall behind it.', 'good');
+    updateObjective();
+  } else {
+    showMessage('Read the note above the chest.', 'info');
+  }
+}
+
+function useTelescope() {
+  hintsUsed++;
+  showMessage('HINT: ' + getHint(), 'info');
+  beep(440, 0.1);
+}
+
+/* PUZZLE 2: keypad code */
+function updateKeypadDisplay() {
+  let shown = '';
+  for (let i = 0; i < SECRET_CODE.length; i++) {
+    shown += (i < enteredCode.length ? enteredCode[i] : '_') + ' ';
+  }
+  $('keypadDisplay').setAttribute('value', shown.trim());
+}
+
+function pressKeypad(label, buttonEl) {
+  if (doorOpen) return;
+  buttonEl.emit('press');
+  beep(500, 0.06);
+
+  if (label === 'C') {
+    enteredCode = '';
+  } else if (label === 'OK') {
+    checkCode();
+    return;
+  } else if (enteredCode.length < SECRET_CODE.length) {
+    enteredCode += label;
+  }
+  updateKeypadDisplay();
+}
+
+function checkCode() {
+  if (enteredCode.length < SECRET_CODE.length) {
+    showMessage('Enter all 3 digits, then press OK.', 'info');
+  } else if (enteredCode === SECRET_CODE) {
+    openDoor();
+  } else {
+    mistakes++;
+    enteredCode = '';
+    updateKeypadDisplay();
+    beep(150, 0.3);
+    showMessage('Wrong code. Look at the clock again.', 'bad');
+  }
+}
+
+/* WIN CONDITION */
+function openDoor() {
+  doorOpen = true;
+  $('door').emit('opendoor');
+  $('exitLight').setAttribute('light', 'intensity', 1.6);
+  updateObjective();
+  beep(880, 0.3);
+  setTimeout(() => beep(1100, 0.4), 250);
+
+  const seconds = Math.round((Date.now() - startTime) / 1000);
+  let rating;
+  if (mistakes === 0 && hintsUsed === 0) {
+    rating = 'Perfect escape!';
+  } else if (mistakes <= 3) {
+    rating = 'Great work!';
+  } else {
+    rating = 'You made it out!';
+  }
+  $('winStats').setAttribute('value',
+    rating + '\nTime: ' + seconds + ' seconds\nMistakes: ' + mistakes + '   Hints: ' + hintsUsed);
+
+  showMessage('The door swings open. Daylight pours in!', 'good');
+  setTimeout(() => {
+    $('winPanel').setAttribute('visible', true);
+    setClickable($('againBtn'), true);
+  }, 1800);
+}
+
+/* Keep the player inside the room */
+AFRAME.registerComponent('room-bounds', {
+  tick: function () {
+    const p = this.el.object3D.position;
+    p.x = Math.max(-3.4, Math.min(3.2, p.x));
+    p.z = Math.max(-3.2, Math.min(3.6, p.z));
+  }
+});
+
+/* ---------- Setup: build objects and attach event listeners ---------- */
+function init() {
+  // Stars on the ceiling
+  for (let i = 0; i < 40; i++) {
+    const star = document.createElement('a-sphere');
+    star.setAttribute('radius', 0.03);
+    star.setAttribute('material', 'shader: flat; color: #fff6c0');
+    star.setAttribute('position', (Math.random() * 7 - 3.5) + ' 3.95 ' + (Math.random() * 7 - 3.5));
+    scene.appendChild(star);
+  }
+
+  // Keypad buttons (array + loop)
+  const labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', 'OK'];
+  const keypad = $('keypad');
+  labels.forEach((label, index) => {
+    const col = index % 3;
+    const row = Math.floor(index / 3);
+    const btn = document.createElement('a-box');
+    btn.setAttribute('class', 'clickable');
+    btn.setAttribute('data-label', 'Keypad ' + label);
+    btn.setAttribute('width', 0.2);
+    btn.setAttribute('height', 0.18);
+    btn.setAttribute('depth', 0.05);
+    btn.setAttribute('position', ((col - 1) * 0.23) + ' ' + (0.2 - row * 0.24) + ' 0.05');
+    btn.setAttribute('color', label === 'OK' ? '#2e7d32' : (label === 'C' ? '#b71c1c' : '#555'));
+    btn.setAttribute('animation__press', 'property: scale; from: 1 1 1; to: 0.8 0.8 1; dur: 100; dir: alternate; loop: 1; startEvents: press');
+    const text = document.createElement('a-text');
+    text.setAttribute('value', label);
+    text.setAttribute('align', 'center');
+    text.setAttribute('width', 1.4);
+    text.setAttribute('position', '0 0 0.03');
+    text.setAttribute('color', '#fff');
+    btn.appendChild(text);
+    btn.addEventListener('click', () => { if (gameStarted) pressKeypad(label, btn); });
+    keypad.appendChild(btn);
+  });
+  updateKeypadDisplay();
+
+  // Event listeners for the interactive objects
+  $('beginBtn').addEventListener('click', startGame);
+  $('lamp').addEventListener('click', () => { if (gameStarted) toggleLamp(); });
+  $('drawer').addEventListener('click', () => { if (gameStarted) useDrawer(); });
+  $('key').addEventListener('click', () => { if (gameStarted) takeKey(); });
+  $('chest').addEventListener('click', () => { if (gameStarted) useChest(); });
+  $('telescope').addEventListener('click', () => { if (gameStarted) useTelescope(); });
+  $('againBtn').addEventListener('click', () => location.reload());
+  document.querySelectorAll('.colour-btn').forEach((btn) => {
+    btn.addEventListener('click', () => { if (gameStarted) pressColour(btn.dataset.colour, btn); });
+  });
+
+  // Hover labels: show the name of whatever the player is pointing at
+  document.querySelectorAll('[data-label]').forEach((el) => {
+    el.addEventListener('mouseenter', () => {
+      $('hoverLabel').setAttribute('value', el.dataset.label);
+      if (scene.canvas) scene.canvas.style.cursor = 'pointer';
+    });
+    el.addEventListener('mouseleave', () => {
+      $('hoverLabel').setAttribute('value', '');
+      if (scene.canvas) scene.canvas.style.cursor = 'default';
+    });
+  });
+
+  // Key starts non-clickable until the drawer is open; win button until the door opens
+  setClickable($('key'), false);
+  setClickable($('againBtn'), false);
+
+  // In VR (no mouse), add a gaze cursor to the camera
+  scene.addEventListener('enter-vr', () => {
+    if ($('gaze')) return;
+    const gaze = document.createElement('a-entity');
+    gaze.setAttribute('id', 'gaze');
+    gaze.setAttribute('cursor', 'fuse: true; fuseTimeout: 1500');
+    gaze.setAttribute('raycaster', 'objects: .clickable; far: 12');
+    gaze.setAttribute('position', '0 0 -1');
+    gaze.setAttribute('geometry', 'primitive: ring; radiusInner: 0.012; radiusOuter: 0.02');
+    gaze.setAttribute('material', 'shader: flat; color: white');
+    $('head').appendChild(gaze);
+  });
+  scene.addEventListener('exit-vr', () => {
+    const gaze = $('gaze');
+    if (gaze) gaze.parentNode.removeChild(gaze);
+  });
+
+  updateLighting();
+  $('objective').setAttribute('value', '');
+  showMessage('', 'info');
+}
+
+if (scene.hasLoaded) init();
+else scene.addEventListener('loaded', init);
+</script>
 </body>
 </html>
