@@ -1,412 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Laboratory - VR Escape Room</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-        
-        #hud {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 999;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border: 2px solid #00ff00;
-            border-radius: 5px;
-            font-size: 14px;
-            max-width: 300px;
-        }
-        
-        #status-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border: 3px solid #00ff00;
-            border-radius: 5px;
-            font-size: 20px;
-            text-align: center;
-            display: none;
-            min-width: 400px;
-        }
-        
-        #instructions {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 999;
-            color: #ffff00;
-            font-family: Arial, sans-serif;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px 30px;
-            border: 2px solid #ffff00;
-            border-radius: 5px;
-            font-size: 12px;
-            text-align: center;
-        }
-        
-        .puzzle-solved {
-            color: #00ff00 !important;
-        }
-        
-        .warning {
-            color: #ff0000 !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Underground Water VR Escape Room</title>
+  
+  <!-- A-Frame Library -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: none;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    /* Top HUD Bar */
+    #hud-overlay {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 1000;
+      background: rgba(8, 24, 38, 0.85);
+      border: 2px solid #00f0ff;
+      border-radius: 12px;
+      padding: 15px 20px;
+      color: #ffffff;
+      max-width: 380px;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+      pointer-events: none;
+    }
+
+    #hud-overlay h2 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      color: #00f0ff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .hud-line {
+      font-size: 14px;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .hud-label {
+      color: #a0e0ff;
+      font-weight: bold;
+    }
+
+    #hud-status {
+      color: #ffdd44;
+      font-weight: bold;
+    }
+
+    /* Win Message Screen overlay */
+    #win-overlay {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1500;
+      background: rgba(0, 40, 20, 0.95);
+      border: 3px solid #00ff88;
+      padding: 30px 50px;
+      border-radius: 16px;
+      text-align: center;
+      color: #ffffff;
+      box-shadow: 0 0 40px rgba(0, 255, 136, 0.6);
+      pointer-events: none;
+    }
+
+    #win-overlay h1 {
+      color: #00ff88;
+      font-size: 36px;
+      margin: 0 0 10px 0;
+    }
+  </style>
 </head>
 <body>
-    <!-- HUD Display -->
-    <div id="hud">
-        <div>STATUS: <span id="status">INITIALIZING</span></div>
-        <div>PUZZLES SOLVED: <span id="puzzle-count">0/3</span></div>
-        <div style="margin-top: 10px; font-size: 12px;">
-            <div>Door Lock: <span id="door-status">LOCKED</span></div>
-            <div>Chemicals: <span id="chemical-status">NOT MIXED</span></div>
-            <div>Radiation: <span id="radiation-status">UNSAFE</span></div>
-        </div>
-    </div>
+
+  <!-- Top In-Game HUD -->
+  <div id="hud-overlay">
+    <h2>🌊 Water Cavern Escape</h2>
+    <div class="hud-line"><span class="hud-label">Objective:</span> <span id="hud-goal">Turn 3 water valves to lower water.</span></div>
+    <div class="hud-line"><span class="hud-label">Inventory:</span> <span id="hud-item">Empty</span></div>
+    <div class="hud-line"><span class="hud-label">Status:</span> <span id="hud-status">Water is high!</span></div>
+  </div>
+
+  <!-- Win Banner -->
+  <div id="win-overlay">
+    <h1>🎉 YOU ESCAPED!</h1>
+    <p style="font-size: 18px;">You turned off the water, swiped the keycard, and unlocked the heavy door!</p>
+  </div>
+
+  <!-- A-Frame 3D Scene -->
+  <a-scene fog="type: exponential; color: #04121c; density: 0.075;" light="defaultLightsEnabled: false">
     
-    <!-- Status Message -->
-    <div id="status-message"></div>
-    
-    <!-- Instructions -->
-    <div id="instructions">
-        Click on objects to interact. Look for clues and solve puzzles to escape!
-    </div>
+    <!-- Camera & Raycaster Cursor for VR / Desktop -->
+    <a-entity id="rig" position="0 0 5">
+      <a-camera id="camera" look-controls>
+        <a-cursor 
+          id="cursor"
+          position="0 0 -1"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+          material="color: #00f0ff; shader: flat"
+          raycaster="objects: .clickable; far: 20">
+        </a-cursor>
+      </a-camera>
+    </a-entity>
 
-    <!-- A-Frame Scene -->
-    <a-scene background="color: #1a1a2e" fog="type: linear; color: #1a1a2e; far: 100">
-        
-        <!-- Camera with Raycaster for Interaction -->
-        <a-entity id="camera" camera="userHeight: 1.6" position="0 0 5" look-controls wasd-controls>
-            <a-entity cursor="fuse: true; fuseTimeout: 2000" 
-                      position="0 0 -1"
-                      geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                      material="color: #4CAF50; shader: flat">
-            </a-entity>
-            <a-entity raycaster="objects: .interactive" line="color: #4CAF50"></a-entity>
-        </a-entity>
+    <!-- Ambient & Point Lighting -->
+    <a-light type="ambient" color="#0b2b3d" intensity="0.8"></a-light>
+    <a-light type="point" color="#00d8ff" intensity="1.5" position="0 4 -2" distance="15"></a-light>
+    <a-light type="point" color="#ffaa44" intensity="1.2" position="-4 2 -3" distance="10"></a-light>
+    <a-light type="point" color="#00ffaa" intensity="1.0" position="4 2 2" distance="10"></a-light>
 
-        <!-- LIGHTING -->
-        <a-light type="ambient" color="#4a4a6a" intensity="0.6"></a-light>
-        <a-light type="directional" color="#ffffff" intensity="0.8" position="5 10 5"></a-light>
+    <!-- Room Geometry (Underground Stone Cavern) -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="16" height="16" color="#121b22" roughness="0.8" metalness="0.2"></a-plane>
+    <a-plane position="0 6 0" rotation="90 0 0" width="16" height="16" color="#0a1015" roughness="0.9"></a-plane>
+    <a-plane position="0 3 -8" rotation="0 0 0" width="16" height="6" color="#182530" roughness="0.7"></a-plane>
+    <a-plane position="0 3 8" rotation="0 180 0" width="16" height="6" color="#182530" roughness="0.7"></a-plane>
+    <a-plane position="-8 3 0" rotation="0 90 0" width="16" height="6" color="#14202a" roughness="0.7"></a-plane>
+    <a-plane position="8 3 0" rotation="0 -90 0" width="16" height="6" color="#14202a" roughness="0.7"></a-plane>
 
-        <!-- FLOOR -->
-        <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="20" height="20" 
-                  material="color: #2a2a4e; metalness: 0.6; roughness: 0.4;">
-        </a-plane>
+    <!-- Stone Pillars with Glowing Crystal Formations (Code Hints: 4, 2, 7) -->
+    <a-box position="-7.5 3 -2" width="1" height="6" depth="1.5" color="#0d1720"></a-box>
+    <a-entity position="-6.9 2.2 -2">
+      <a-cone position="0 0 0" radius-bottom="0.12" height="0.6" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 0.8" rotation="0 0 -45"></a-cone>
+      <a-cone position="0 0.3 0.2" radius-bottom="0.09" height="0.5" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 0.8" rotation="15 0 -30"></a-cone>
+      <a-text value="4 CRYSTALS" position="0.2 0.8 0" rotation="0 90 0" scale="0.6 0.6 0.6" color="#00ffff"></a-text>
+    </a-entity>
 
-        <!-- WALLS -->
-        <a-plane position="-10 5 0" rotation="0 0 0" width="20" height="10"
-                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
-        </a-plane>
-        
-        <a-plane position="10 5 0" rotation="0 0 0" width="20" height="10"
-                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
-        </a-plane>
-        
-        <a-plane position="0 5 -10" rotation="0 0 0" width="20" height="10"
-                  material="color: #16213e; metalness: 0.5; roughness: 0.5;">
-        </a-plane>
+    <a-box position="7.5 3 -2" width="1" height="6" depth="1.5" color="#0d1720"></a-box>
+    <a-entity position="6.9 2.0 -2">
+      <a-cone position="0 0 0" radius-bottom="0.15" height="0.7" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 0.8" rotation="0 0 45"></a-cone>
+      <a-text value="2 CRYSTALS" position="-0.2 0.8 0" rotation="0 -90 0" scale="0.6 0.6 0.6" color="#00ffff"></a-text>
+    </a-entity>
 
-        <!-- CEILING -->
-        <a-plane position="0 10 0" rotation="90 0 0" width="20" height="20"
-                  material="color: #0f3460; metalness: 0.7; roughness: 0.3;">
-        </a-plane>
+    <a-entity position="-5.5 1.5 -7.8">
+      <a-cone position="-0.15 0.2 0" radius-bottom="0.08" height="0.6" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 0.8"></a-cone>
+      <a-text value="7 CRYSTALS" position="-0.2 0.8 0" scale="0.6 0.6 0.6" color="#00ffff"></a-text>
+    </a-entity>
 
-        <!-- DOOR (Exit) -->
-        <a-box id="exit-door" class="interactive" position="-9.8 4 -9.8" width="2" height="5" depth="0.3"
-               material="color: #8b0000; metalness: 0.8; roughness: 0.2;">
-        </a-box>
-        
-        <a-text id="door-label" value="EXIT DOOR" position="-9.8 5.5 -9.5" scale="2 2 2"
-                color="#ffff00" align="center"></a-text>
+    <!-- Animated Water Plane -->
+    <a-plane id="water" position="0 1.4 0" rotation="-90 0 0" width="16" height="16" 
+             material="color: #006699; transparent: true; opacity: 0.65; metalness: 0.8; roughness: 0.1">
+    </a-plane>
 
-        <!-- PUZZLE 1: KEYPAD (for Door Lock) -->
-        <a-box id="keypad" class="interactive" position="-8 4 -9.6" width="1.5" height="2" depth="0.2"
-               material="color: #222222; metalness: 0.9; roughness: 0.1;">
-        </a-box>
-        
-        <a-text value="KEYPAD" position="-8 4.7 -9.4" scale="1.5 1.5 1.5"
-                color="#00ff00" align="center"></a-text>
+    <!-- PUZZLE 1: Industrial Pipe Machine with 3 Color Valves -->
+    <a-group position="-5 1.5 -3">
+      <a-box position="0 0.5 0" width="3.2" height="2.2" depth="0.3" color="#1a2630" metalness="0.5"></a-box>
+      <a-text value="WATER PUMP SYSTEM" position="-1.3 1.3 0.17" color="#00f0ff" scale="0.7 0.7 0.7"></a-text>
+      <a-text value="Order: BLUE -> RED -> YELLOW" position="-1.3 1.05 0.17" color="#ffffff" scale="0.45 0.45 0.45"></a-text>
 
-        <!-- PUZZLE 2: Chemical Mixer -->
-        <a-cylinder id="chemical-mixer" class="interactive" position="5 1 -3" 
-                    radius="0.8" height="1.5" material="color: #1a472a; metalness: 0.6; roughness: 0.4;">
-        </a-cylinder>
-        
-        <a-text value="MIXER" position="5 2.2 -3" scale="1.5 1.5 1.5"
-                color="#00ff00" align="center"></a-text>
+      <a-entity id="valveBlue" class="clickable" position="-1 0.3 0.2">
+        <a-torus radius="0.25" radius-tubular="0.03" color="#0088ff"></a-torus>
+        <a-text value="1. BLUE" position="-0.3 -0.4 0" scale="0.5 0.5 0.5" color="#0088ff"></a-text>
+      </a-entity>
 
-        <!-- Chemical Container A -->
-        <a-box id="chemical-a" class="interactive" position="3 1 -2" width="0.6" height="1.2" depth="0.6"
-               material="color: #ff6b9d; metalness: 0.7; roughness: 0.3;">
-        </a-box>
-        
-        <a-text value="RED CHEMICAL" position="3 2 -2" scale="1 1 1"
-                color="#ffff00" align="center"></a-text>
+      <a-entity id="valveRed" class="clickable" position="0 0.3 0.2">
+        <a-torus radius="0.25" radius-tubular="0.03" color="#ff3333"></a-torus>
+        <a-text value="2. RED" position="-0.25 -0.4 0" scale="0.5 0.5 0.5" color="#ff3333"></a-text>
+      </a-entity>
 
-        <!-- Chemical Container B -->
-        <a-box id="chemical-b" class="interactive" position="7 1 -2" width="0.6" height="1.2" depth="0.6"
-               material="color: #00d9ff; metalness: 0.7; roughness: 0.3;">
-        </a-box>
-        
-        <a-text value="BLUE CHEMICAL" position="7 2 -2" scale="1 1 1"
-                color="#ffff00" align="center"></a-text>
+      <a-entity id="valveYellow" class="clickable" position="1 0.3 0.2">
+        <a-torus radius="0.25" radius-tubular="0.03" color="#ffcc00"></a-torus>
+        <a-text value="3. YELLOW" position="-0.4 -0.4 0" scale="0.5 0.5 0.5" color="#ffcc00"></a-text>
+      </a-entity>
+    </a-group>
 
-        <!-- PUZZLE 3: Radiation Shield -->
-        <a-sphere id="radiation-source" position="-5 3 5" radius="1"
-                   material="color: #ffff00; emissive: #ffff00; emissiveIntensity: 0.8;">
-        </a-sphere>
-        
-        <a-text value="RADIATION" position="-5 4.5 5" scale="1.5 1.5 1.5"
-                color="#ff0000" align="center"></a-text>
+    <!-- PUZZLE 2: Keycard Item -->
+    <a-cylinder position="4 0.4 -4" radius="0.4" height="0.8" color="#1a2630"></a-cylinder>
+    <a-box id="keycard" class="clickable" position="4 0.85 -4" rotation="0 30 0" width="0.5" height="0.04" depth="0.3" 
+           color="#00f0ff" material="emissive: #0088aa; emissiveIntensity: 0.5">
+      <a-text value="KEYCARD" position="-0.15 0.03 0" rotation="-90 0 0" scale="0.25 0.25 0.25" color="#000"></a-text>
+    </a-box>
 
-        <!-- Shield Control Panel -->
-        <a-box id="shield-control" class="interactive" position="-5 2 2" width="1.5" height="2" depth="0.3"
-               material="color: #4a4a4a; metalness: 0.8; roughness: 0.2;">
-        </a-box>
-        
-        <a-text value="SHIELD CONTROL" position="-5 3.2 1.85" scale="1 1 1"
-                color="#00ff00" align="center"></a-text>
+    <!-- EXIT VAULT DOOR & TERMINALS -->
+    <a-box id="doorLeft" position="-1 2.5 -7.6" width="2" height="4" depth="0.2" color="#2c3e50" metalness="0.7"></a-box>
+    <a-box id="doorRight" position="1 2.5 -7.6" width="2" height="4" depth="0.2" color="#2c3e50" metalness="0.7"></a-box>
 
-        <!-- CLUE: Computer Terminal -->
-        <a-box id="computer" position="8 2.5 8" width="1.5" height="1.5" depth="0.3"
-               material="color: #000000; metalness: 0.9; roughness: 0.1;">
-        </a-box>
-        
-        <a-plane id="screen" position="8 2.5 7.85" width="1.3" height="1.3"
-                 material="color: #001a00; emissive: #001a00;">
-        </a-plane>
-        
-        <a-text id="computer-text" value="NO ENTRY UNTIL:\n- DOOR UNLOCKED\n- CHEMICALS MIXED\n- RADIATION SAFE" 
-                position="8 2.5 7.8" scale="0.8 0.8 0.8"
-                color="#00ff00" align="center" baseline="center"></a-text>
+    <!-- Keycard Reader Terminal -->
+    <a-group position="-2.7 1.8 -7.5">
+      <a-box width="0.6" height="0.8" depth="0.15" color="#15222d"></a-box>
+      <a-box id="cardSlot" class="clickable" position="0 0 0.09" width="0.4" height="0.1" depth="0.05" color="#334455"></a-box>
+      <a-circle id="cardLight" position="0 0.25 0.09" radius="0.06" color="#ff3333" material="emissive: #ff3333; emissiveIntensity: 0.6"></a-circle>
+      <a-text value="SWIPE CARD" position="-0.24 -0.28 0.09" scale="0.35 0.35 0.35" color="#fff"></a-text>
+    </a-group>
 
-        <!-- Decorative Elements -->
-        <a-box position="-3 1 3" width="2" height="2" depth="2"
-               material="color: #2a5a4a; metalness: 0.6; roughness: 0.4;">
-        </a-box>
-        
-        <a-cylinder position="6 1 6" radius="0.5" height="3"
-                    material="color: #1a3a5a; metalness: 0.7; roughness: 0.3;">
-        </a-cylinder>
+    <!-- PUZZLE 3: Keypad Terminal -->
+    <a-group position="2.7 1.8 -7.5">
+      <a-box width="0.9" height="1.4" depth="0.15" color="#15222d"></a-box>
+      <a-plane position="0 0.45 0.09" width="0.7" height="0.25" color="#051518">
+        <a-text id="keypadDisplay" value="---" position="0 0 0.01" align="center" width="2" color="#00f0ff"></a-text>
+      </a-plane>
 
-        <!-- Lighting Effects -->
-        <a-light type="point" color="#ff6b9d" intensity="0.6" position="3 2 -2"></a-light>
-        <a-light type="point" color="#00d9ff" intensity="0.6" position="7 2 -2"></a-light>
-        <a-light type="point" color="#ffff00" intensity="0.8" position="-5 4 5"></a-light>
+      <a-box class="clickable keypad-btn" data-val="1" position="-0.22 0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="1" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="2" position="0 0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="2" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="3" position="0.22 0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="3" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="4" position="-0.22 0.0 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="4" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="5" position="0 0.0 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="5" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="6" position="0.22 0.0 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="6" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="7" position="-0.22 -0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="7" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="8" position="0 -0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="8" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="9" position="0.22 -0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="9" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="CLR" position="-0.22 -0.4 0.09" width="0.18" height="0.15" depth="0.05" color="#aa2233"><a-text value="C" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="0" position="0 -0.4 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="0" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
+      <a-box class="clickable keypad-btn" data-val="OK" position="0.22 -0.4 0.09" width="0.18" height="0.15" depth="0.05" color="#22aa55"><a-text value="OK" align="center" position="0 0 0.03" scale="0.35 0.35 0.35" color="#fff"></a-text></a-box>
+    </a-group>
 
-    </a-scene>
+  </a-scene>
 
-    <!-- JavaScript Logic -->
-    <script>
-        // ============ GAME STATE ============
-        const gameState = {
-            doorUnlocked: false,
-            chemicalsMixed: false,
-            radiationSafe: false,
-            puzzlesSolved: 0,
-            keypadAttempts: 0,
-            chemicalA_used: false,
-            chemicalB_used: false,
-            shieldActivated: false,
-            gameWon: false
-        };
+  <!-- Game Logic JavaScript -->
+  <script>
+    let valveSequence = [];
+    const correctSequence = ["blue", "red", "yellow"];
+    let waterDrained = false;
+    let hasKeycard = false;
+    let cardSwiped = false;
+    let keypadInput = "";
+    const correctCode = "427";
+    let gameWon = false;
 
-        // ============ DOM ELEMENTS ============
-        const doorElement = document.getElementById('exit-door');
-        const keypadElement = document.getElementById('keypad');
-        const chemicalMixerElement = document.getElementById('chemical-mixer');
-        const chemicalAElement = document.getElementById('chemical-a');
-        const chemicalBElement = document.getElementById('chemical-b');
-        const shieldControlElement = document.getElementById('shield-control');
-        const radiationElement = document.getElementById('radiation-source');
-        const statusMessage = document.getElementById('status-message');
-        const statusSpan = document.getElementById('status');
-        const puzzleCountSpan = document.getElementById('puzzle-count');
-        const doorStatusSpan = document.getElementById('door-status');
-        const chemicalStatusSpan = document.getElementById('chemical-status');
-        const radiationStatusSpan = document.getElementById('radiation-status');
+    document.addEventListener("DOMContentLoaded", () => {
+      const waterEl = document.getElementById("water");
+      const keycardEl = document.getElementById("keycard");
+      const cardSlotEl = document.getElementById("cardSlot");
+      const cardLightEl = document.getElementById("cardLight");
+      const keypadDisplay = document.getElementById("keypadDisplay");
+      const doorLeft = document.getElementById("doorLeft");
+      const doorRight = document.getElementById("doorRight");
 
-        // ============ HELPER FUNCTIONS ============
-        
-        /**
-         * Display a message to the player
-         * @param {string} message - The message to display
-         * @param {number} duration - Duration to show message in milliseconds
-         */
-        function showMessage(message, duration = 3000) {
-            statusMessage.textContent = message;
-            statusMessage.style.display = 'block';
-            setTimeout(() => {
-                statusMessage.style.display = 'none';
-            }, duration);
+      const hudGoal = document.getElementById("hud-goal");
+      const hudItem = document.getElementById("hud-item");
+      const hudStatus = document.getElementById("hud-status");
+
+      function handleValveClick(color) {
+        if (waterDrained) return;
+        const currentExpected = correctSequence[valveSequence.length];
+
+        if (color === currentExpected) {
+          valveSequence.push(color);
+          hudStatus.innerText = `Correct valve! (${valveSequence.length}/3)`;
+
+          if (valveSequence.length === 3) {
+            waterDrained = true;
+            hudStatus.innerText = "Water drained completely!";
+            hudGoal.innerText = "Pick up the glowing keycard from the pedestal.";
+            waterEl.setAttribute("animation", "property: position; to: 0 -0.5 0; dur: 3500; easing: easeInOutQuad");
+          }
+        } else {
+          valveSequence = [];
+          hudStatus.innerText = "Wrong sequence! Valves reset. Start with BLUE.";
         }
+      }
 
-        /**
-         * Update the HUD display
-         */
-        function updateHUD() {
-            statusSpan.textContent = gameState.gameWon ? 'ESCAPED!' : 'IN PROGRESS';
-            puzzleCountSpan.textContent = `${gameState.puzzlesSolved}/3`;
-            doorStatusSpan.textContent = gameState.doorUnlocked ? 'UNLOCKED' : 'LOCKED';
-            doorStatusSpan.className = gameState.doorUnlocked ? 'puzzle-solved' : '';
-            
-            chemicalStatusSpan.textContent = gameState.chemicalsMixed ? 'MIXED' : 'NOT MIXED';
-            chemicalStatusSpan.className = gameState.chemicalsMixed ? 'puzzle-solved' : '';
-            
-            radiationStatusSpan.textContent = gameState.radiationSafe ? 'SAFE' : 'UNSAFE';
-            radiationStatusSpan.className = gameState.radiationSafe ? 'puzzle-solved' : '';
+      document.getElementById("valveBlue").addEventListener("click", () => handleValveClick("blue"));
+      document.getElementById("valveRed").addEventListener("click", () => handleValveClick("red"));
+      document.getElementById("valveYellow").addEventListener("click", () => handleValveClick("yellow"));
+
+      keycardEl.addEventListener("click", () => {
+        if (!waterDrained) {
+          hudStatus.innerText = "Water level is too high to reach keycard!";
+          return;
         }
+        if (hasKeycard) return;
+        hasKeycard = true;
+        keycardEl.setAttribute("visible", "false");
+        hudItem.innerText = "Keycard";
+        hudStatus.innerText = "Keycard acquired!";
+        hudGoal.innerText = "Swipe keycard on the terminal next to the door.";
+      });
 
-        /**
-         * Check if all puzzles are solved and open the door
-         */
-        function checkWinCondition() {
-            if (gameState.doorUnlocked && gameState.chemicalsMixed && gameState.radiationSafe) {
-                completeGame();
-            }
+      cardSlotEl.addEventListener("click", () => {
+        if (!hasKeycard) {
+          hudStatus.innerText = "Terminal Locked: Requires Keycard!";
+          return;
         }
+        if (cardSwiped) return;
+        cardSwiped = true;
+        cardLightEl.setAttribute("color", "#00ff88");
+        cardLightEl.setAttribute("material", "emissive: #00ff88; emissiveIntensity: 0.8");
+        hudStatus.innerText = "Keycard accepted! Door Keypad Active.";
+        hudGoal.innerText = "Count wall crystals & enter code on Keypad.";
+      });
 
-        /**
-         * Complete the game when player escapes
-         */
-        function completeGame() {
-            gameState.gameWon = true;
-            gameState.gameWon = true;
-            showMessage('🎉 ESCAPE SUCCESSFUL! 🎉\nYou have escaped The Laboratory!', 5000);
-            doorElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00; emissiveIntensity: 0.5;');
-            updateHUD();
-        }
+      document.querySelectorAll(".keypad-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (!cardSwiped || gameWon) return;
+          const val = btn.getAttribute("data-val");
 
-        // ============ PUZZLE 1: KEYPAD (Door Lock) ============
-        keypadElement.addEventListener('click', function() {
-            if (gameState.doorUnlocked) {
-                showMessage('Door is already unlocked!');
-                return;
-            }
-
-            // Random code for this playthrough (can be changed to fixed)
-            const correctCode = '1234';
-            gameState.keypadAttempts++;
-
-            // Simulate keypad interaction
-            const userCode = prompt('Enter the door code (Hint: Look for clues!)');
-            
-            if (userCode === correctCode) {
-                gameState.doorUnlocked = true;
-                gameState.puzzlesSolved++;
-                showMessage('✓ DOOR UNLOCKED!\nCode accepted: ' + correctCode);
-                keypadElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00;');
-                updateHUD();
-                checkWinCondition();
+          if (val === "CLR") {
+            keypadInput = "";
+          } else if (val === "OK") {
+            if (keypadInput === correctCode) {
+              gameWon = true;
+              keypadDisplay.setAttribute("value", "OPEN");
+              hudStatus.innerText = "CODE CORRECT! VAULT OPENING!";
+              hudGoal.innerText = "ESCAPE COMPLETE!";
+              doorLeft.setAttribute("animation", "property: position; to: -2.8 2.5 -7.6; dur: 2500; easing: easeInOutQuad");
+              doorRight.setAttribute("animation", "property: position; to: 2.8 2.5 -7.6; dur: 2500; easing: easeInOutQuad");
+              setTimeout(() => { document.getElementById("win-overlay").style.display = "block"; }, 1200);
             } else {
-                showMessage('✗ INCORRECT CODE\nAttempt ' + gameState.keypadAttempts + '\nTry again!');
+              keypadDisplay.setAttribute("value", "ERR");
+              hudStatus.innerText = "Incorrect Code! Check crystal counts.";
+              setTimeout(() => { keypadInput = ""; keypadDisplay.setAttribute("value", "---"); }, 1200);
             }
+            return;
+          } else {
+            if (keypadInput.length < 3) keypadInput += val;
+          }
+          keypadDisplay.setAttribute("value", keypadInput.padEnd(3, "-"));
         });
-
-        // ============ PUZZLE 2: Chemical Mixer ============
-        chemicalAElement.addEventListener('click', function() {
-            if (gameState.chemicalA_used) {
-                showMessage('Red chemical already used in mixer!');
-                return;
-            }
-            gameState.chemicalA_used = true;
-            showMessage('Added RED CHEMICAL to mixer');
-            chemicalAElement.setAttribute('material', 'color: #660000; metalness: 0.9;');
-            checkChemicalMix();
-        });
-
-        chemicalBElement.addEventListener('click', function() {
-            if (gameState.chemicalB_used) {
-                showMessage('Blue chemical already used in mixer!');
-                return;
-            }
-            gameState.chemicalB_used = true;
-            showMessage('Added BLUE CHEMICAL to mixer');
-            chemicalBElement.setAttribute('material', 'color: #003366; metalness: 0.9;');
-            checkChemicalMix();
-        });
-
-        /**
-         * Check if both chemicals have been added to mixer
-         */
-        function checkChemicalMix() {
-            if (gameState.chemicalA_used && gameState.chemicalB_used && !gameState.chemicalsMixed) {
-                gameState.chemicalsMixed = true;
-                gameState.puzzlesSolved++;
-                showMessage('✓ CHEMICALS MIXED!\nPurple solution created successfully!');
-                chemicalMixerElement.setAttribute('material', 'color: #8b00ff; emissive: #8b00ff; emissiveIntensity: 0.6;');
-                updateHUD();
-                checkWinCondition();
-            }
-        }
-
-        // ============ PUZZLE 3: Radiation Shield ============
-        shieldControlElement.addEventListener('click', function() {
-            if (gameState.radiationSafe) {
-                showMessage('Radiation shield already activated!');
-                return;
-            }
-
-            // Simple yes/no question to test understanding
-            const userAnswer = prompt('Enter shield activation code (Hint: How many puzzle clues did you find?)\nAnswer should be a number.');
-            
-            if (userAnswer === '3' || userAnswer === 'three') {
-                gameState.radiationSafe = true;
-                gameState.shieldActivated = true;
-                gameState.puzzlesSolved++;
-                showMessage('✓ SHIELD ACTIVATED!\nRadiation levels normalized!');
-                shieldControlElement.setAttribute('material', 'color: #00ff00; emissive: #00ff00;');
-                radiationElement.setAttribute('material', 'color: #00aa00; emissive: #00aa00; emissiveIntensity: 0.4;');
-                updateHUD();
-                checkWinCondition();
-            } else {
-                showMessage('✗ INCORRECT ACTIVATION CODE\nTry thinking about what you\'ve seen...');
-            }
-        });
-
-        // ============ EXIT DOOR INTERACTION ============
-        doorElement.addEventListener('click', function() {
-            if (gameState.gameWon) {
-                showMessage('You have successfully escaped!');
-            } else if (gameState.doorUnlocked) {
-                if (gameState.chemicalsMixed && gameState.radiationSafe) {
-                    completeGame();
-                } else {
-                    showMessage('Door is open, but you haven\'t solved all puzzles yet!\nAll systems must be operational to escape.');
-                }
-            } else {
-                showMessage('✗ DOOR LOCKED\nYou need to enter the correct keypad code!');
-            }
-        });
-
-        // ============ INITIALIZATION ============
-        function initializeGame() {
-            console.log('The Laboratory - VR Escape Room Initialized');
-            updateHUD();
-            showMessage('WELCOME TO THE LABORATORY\n\nSolve all puzzles to escape!\nGood luck!', 5000);
-        }
-
-        // Start game when page loads
-        window.addEventListener('load', initializeGame);
-    </script>
+      });
+    });
+  </script>
 </body>
 </html>
