@@ -1,325 +1,163 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Underground Water VR Escape Room</title>
-  
-  <!-- A-Frame Library -->
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      user-select: none;
-      overflow: hidden;
-      background-color: #000;
-    }
-
-    /* Top HUD Bar */
-    #hud-overlay {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      z-index: 1000;
-      background: rgba(8, 24, 38, 0.85);
-      border: 2px solid #00f0ff;
-      border-radius: 12px;
-      padding: 15px 20px;
-      color: #ffffff;
-      max-width: 380px;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-      pointer-events: none;
-    }
-
-    #hud-overlay h2 {
-      margin: 0 0 8px 0;
-      font-size: 18px;
-      color: #00f0ff;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .hud-line {
-      font-size: 14px;
-      margin-bottom: 6px;
-      line-height: 1.4;
-    }
-
-    .hud-label {
-      color: #a0e0ff;
-      font-weight: bold;
-    }
-
-    #hud-status {
-      color: #ffdd44;
-      font-weight: bold;
-    }
-
-    /* Win Message Screen overlay */
-    #win-overlay {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1500;
-      background: rgba(0, 40, 20, 0.95);
-      border: 3px solid #00ff88;
-      padding: 30px 50px;
-      border-radius: 16px;
-      text-align: center;
-      color: #ffffff;
-      box-shadow: 0 0 40px rgba(0, 255, 136, 0.6);
-      pointer-events: none;
-    }
-
-    #win-overlay h1 {
-      color: #00ff88;
-      font-size: 36px;
-      margin: 0 0 10px 0;
-    }
-  </style>
+  <title>The Mystery Escape Room</title>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 </head>
+
 <body>
 
-  <!-- Top In-Game HUD -->
-  <div id="hud-overlay">
-    <h2>🌊 Water Cavern Escape</h2>
-    <div class="hud-line"><span class="hud-label">Objective:</span> <span id="hud-goal">Turn 3 water valves to lower water.</span></div>
-    <div class="hud-line"><span class="hud-label">Inventory:</span> <span id="hud-item">Empty</span></div>
-    <div class="hud-line"><span class="hud-label">Status:</span> <span id="hud-status">Water is high!</span></div>
-  </div>
+<a-scene background="color: #b9d8ed">
 
-  <!-- Win Banner -->
-  <div id="win-overlay">
-    <h1>🎉 YOU ESCAPED!</h1>
-    <p style="font-size: 18px;">You turned off the water, swiped the keycard, and unlocked the heavy door!</p>
-  </div>
+  <!-- Lighting -->
+  <a-entity light="type: ambient; intensity: 1.5"></a-entity>
+  <a-entity light="type: directional; intensity: 1.5"
+            position="-3 8 5"></a-entity>
 
-  <!-- A-Frame 3D Scene -->
-  <a-scene fog="type: exponential; color: #04121c; density: 0.075;" light="defaultLightsEnabled: false">
-    
-    <!-- Camera & Raycaster Cursor for VR / Desktop -->
-    <a-entity id="rig" position="0 0 5">
-      <a-camera id="camera" look-controls>
-        <a-cursor 
-          id="cursor"
-          position="0 0 -1"
-          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-          material="color: #00f0ff; shader: flat"
-          raycaster="objects: .clickable; far: 20">
-        </a-cursor>
-      </a-camera>
-    </a-entity>
+  <!-- Floor -->
+  <a-plane rotation="-90 0 0"
+           width="12" height="12"
+           color="#b8a58d"></a-plane>
 
-    <!-- Ambient & Point Lighting -->
-    <a-light type="ambient" color="#0b2b3d" intensity="0.8"></a-light>
-    <a-light type="point" color="#00d8ff" intensity="1.5" position="0 4 -2" distance="15"></a-light>
-    <a-light type="point" color="#ffaa44" intensity="1.2" position="-4 2 -3" distance="10"></a-light>
-    <a-light type="point" color="#00ffaa" intensity="1.0" position="4 2 2" distance="10"></a-light>
+  <!-- Walls -->
+  <a-box position="0 2 -6"
+         width="12" height="4" depth="0.2"
+         color="#91b5d0"></a-box>
 
-    <!-- Room Geometry (Underground Stone Cavern) -->
-    <a-plane position="0 0 0" rotation="-90 0 0" width="16" height="16" color="#121b22" roughness="0.8" metalness="0.2"></a-plane>
-    <a-plane position="0 6 0" rotation="90 0 0" width="16" height="16" color="#0a1015" roughness="0.9"></a-plane>
-    <a-plane position="0 3 -8" rotation="0 0 0" width="16" height="6" color="#182530" roughness="0.7"></a-plane>
-    <a-plane position="0 3 8" rotation="0 180 0" width="16" height="6" color="#182530" roughness="0.7"></a-plane>
-    <a-plane position="-8 3 0" rotation="0 90 0" width="16" height="6" color="#14202a" roughness="0.7"></a-plane>
-    <a-plane position="8 3 0" rotation="0 -90 0" width="16" height="6" color="#14202a" roughness="0.7"></a-plane>
+  <a-box position="-6 2 0"
+         width="0.2" height="4" depth="12"
+         color="#a6c5dd"></a-box>
 
-    <!-- Stone Pillars with Glowing Crystal Formations (Code Hints: 4, 2, 7) -->
-    <a-box position="-7.5 3 -2" width="1" height="6" depth="1.5" color="#0d1720"></a-box>
-    <a-entity position="-6.9 2.2 -2">
-      <a-cone position="0 0 0" radius-bottom="0.12" height="0.6" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 0.8" rotation="0 0 -45"></a-cone>
-      <a-cone position="0 0.3 0.2" radius-bottom="0.09" height="0.5" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 0.8" rotation="15 0 -30"></a-cone>
-      <a-text value="4 CRYSTALS" position="0.2 0.8 0" rotation="0 90 0" scale="0.6 0.6 0.6" color="#00ffff"></a-text>
-    </a-entity>
+  <a-box position="6 2 0"
+         width="0.2" height="4" depth="12"
+         color="#a6c5dd"></a-box>
 
-    <a-box position="7.5 3 -2" width="1" height="6" depth="1.5" color="#0d1720"></a-box>
-    <a-entity position="6.9 2.0 -2">
-      <a-cone position="0 0 0" radius-bottom="0.15" height="0.7" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 0.8" rotation="0 0 45"></a-cone>
-      <a-text value="2 CRYSTALS" position="-0.2 0.8 0" rotation="0 -90 0" scale="0.6 0.6 0.6" color="#00ffff"></a-text>
-    </a-entity>
+  <a-box position="0 2 6"
+         width="12" height="4" depth="0.2"
+         color="#91b5d0"></a-box>
 
-    <a-entity position="-5.5 1.5 -7.8">
-      <a-cone position="-0.15 0.2 0" radius-bottom="0.08" height="0.6" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 0.8"></a-cone>
-      <a-text value="7 CRYSTALS" position="-0.2 0.8 0" scale="0.6 0.6 0.6" color="#00ffff"></a-text>
-    </a-entity>
+  <!-- Ceiling -->
+  <a-box position="0 4 0"
+         width="12" height="0.2" depth="12"
+         color="#dceaf5"></a-box>
 
-    <!-- Animated Water Plane -->
-    <a-plane id="water" position="0 1.4 0" rotation="-90 0 0" width="16" height="16" 
-             material="color: #006699; transparent: true; opacity: 0.65; metalness: 0.8; roughness: 0.1">
-    </a-plane>
+  <!-- Game Title -->
+  <a-text value="THE MYSTERY ESCAPE ROOM"
+          position="-2 3.3 -5.8"
+          color="#172b4d"
+          width="6"></a-text>
 
-    <!-- PUZZLE 1: Industrial Pipe Machine with 3 Color Valves -->
-    <a-group position="-5 1.5 -3">
-      <a-box position="0 0.5 0" width="3.2" height="2.2" depth="0.3" color="#1a2630" metalness="0.5"></a-box>
-      <a-text value="WATER PUMP SYSTEM" position="-1.3 1.3 0.17" color="#00f0ff" scale="0.7 0.7 0.7"></a-text>
-      <a-text value="Order: BLUE -> RED -> YELLOW" position="-1.3 1.05 0.17" color="#ffffff" scale="0.45 0.45 0.45"></a-text>
+  <!-- Key -->
+  <a-entity id="key" position="-3 0.7 -2"
+            class="clickable">
+    <a-cylinder radius="0.1" height="0.7"
+                rotation="0 0 90"
+                color="gold"></a-cylinder>
+    <a-torus radius="0.2" radius-tubular="0.05"
+             position="-0.35 0 0"
+             color="gold"></a-torus>
+  </a-entity>
 
-      <a-entity id="valveBlue" class="clickable" position="-1 0.3 0.2">
-        <a-torus radius="0.25" radius-tubular="0.03" color="#0088ff"></a-torus>
-        <a-text value="1. BLUE" position="-0.3 -0.4 0" scale="0.5 0.5 0.5" color="#0088ff"></a-text>
-      </a-entity>
+  <!-- Box -->
+  <a-box id="box"
+         position="2 0.5 -2"
+         width="1" height="0.8" depth="1"
+         color="#89552d"
+         class="clickable"></a-box>
 
-      <a-entity id="valveRed" class="clickable" position="0 0.3 0.2">
-        <a-torus radius="0.25" radius-tubular="0.03" color="#ff3333"></a-torus>
-        <a-text value="2. RED" position="-0.25 -0.4 0" scale="0.5 0.5 0.5" color="#ff3333"></a-text>
-      </a-entity>
+  <!-- Exit Door -->
+  <a-box id="door"
+         position="0 1.5 -5.8"
+         width="1.5" height="3" depth="0.2"
+         color="#65446d"></a-box>
 
-      <a-entity id="valveYellow" class="clickable" position="1 0.3 0.2">
-        <a-torus radius="0.25" radius-tubular="0.03" color="#ffcc00"></a-torus>
-        <a-text value="3. YELLOW" position="-0.4 -0.4 0" scale="0.5 0.5 0.5" color="#ffcc00"></a-text>
-      </a-entity>
-    </a-group>
+  <a-text value="EXIT"
+          position="-0.4 1.5 -5.65"
+          color="white"
+          width="3"></a-text>
 
-    <!-- PUZZLE 2: Keycard Item -->
-    <a-cylinder position="4 0.4 -4" radius="0.4" height="0.8" color="#1a2630"></a-cylinder>
-    <a-box id="keycard" class="clickable" position="4 0.85 -4" rotation="0 30 0" width="0.5" height="0.04" depth="0.3" 
-           color="#00f0ff" material="emissive: #0088aa; emissiveIntensity: 0.5">
-      <a-text value="KEYCARD" position="-0.15 0.03 0" rotation="-90 0 0" scale="0.25 0.25 0.25" color="#000"></a-text>
-    </a-box>
+  <!-- Player Camera -->
+  <a-entity position="0 0 4">
+    <a-camera>
+      <a-cursor
+        raycaster="objects: .clickable">
+      </a-cursor>
+    </a-camera>
+  </a-entity>
 
-    <!-- EXIT VAULT DOOR & TERMINALS -->
-    <a-box id="doorLeft" position="-1 2.5 -7.6" width="2" height="4" depth="0.2" color="#2c3e50" metalness="0.7"></a-box>
-    <a-box id="doorRight" position="1 2.5 -7.6" width="2" height="4" depth="0.2" color="#2c3e50" metalness="0.7"></a-box>
+</a-scene>
 
-    <!-- Keycard Reader Terminal -->
-    <a-group position="-2.7 1.8 -7.5">
-      <a-box width="0.6" height="0.8" depth="0.15" color="#15222d"></a-box>
-      <a-box id="cardSlot" class="clickable" position="0 0 0.09" width="0.4" height="0.1" depth="0.05" color="#334455"></a-box>
-      <a-circle id="cardLight" position="0 0.25 0.09" radius="0.06" color="#ff3333" material="emissive: #ff3333; emissiveIntensity: 0.6"></a-circle>
-      <a-text value="SWIPE CARD" position="-0.24 -0.28 0.09" scale="0.35 0.35 0.35" color="#fff"></a-text>
-    </a-group>
+<script>
 
-    <!-- PUZZLE 3: Keypad Terminal -->
-    <a-group position="2.7 1.8 -7.5">
-      <a-box width="0.9" height="1.4" depth="0.15" color="#15222d"></a-box>
-      <a-plane position="0 0.45 0.09" width="0.7" height="0.25" color="#051518">
-        <a-text id="keypadDisplay" value="---" position="0 0 0.01" align="center" width="2" color="#00f0ff"></a-text>
-      </a-plane>
+// GAME VARIABLES
+let hasKey = false;
+let boxOpened = false;
+let doorUnlocked = false;
 
-      <a-box class="clickable keypad-btn" data-val="1" position="-0.22 0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="1" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="2" position="0 0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="2" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="3" position="0.22 0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="3" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="4" position="-0.22 0.0 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="4" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="5" position="0 0.0 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="5" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="6" position="0.22 0.0 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="6" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="7" position="-0.22 -0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="7" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="8" position="0 -0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="8" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="9" position="0.22 -0.2 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="9" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="CLR" position="-0.22 -0.4 0.09" width="0.18" height="0.15" depth="0.05" color="#aa2233"><a-text value="C" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="0" position="0 -0.4 0.09" width="0.18" height="0.15" depth="0.05" color="#253746"><a-text value="0" align="center" position="0 0 0.03" scale="0.4 0.4 0.4" color="#fff"></a-text></a-box>
-      <a-box class="clickable keypad-btn" data-val="OK" position="0.22 -0.4 0.09" width="0.18" height="0.15" depth="0.05" color="#22aa55"><a-text value="OK" align="center" position="0 0 0.03" scale="0.35 0.35 0.35" color="#fff"></a-text></a-box>
-    </a-group>
+// SELECT OBJECTS
+const key = document.querySelector("#key");
+const box = document.querySelector("#box");
+const door = document.querySelector("#door");
 
-  </a-scene>
+// PUZZLE 1: FIND KEY
+key.addEventListener("click", function() {
 
-  <!-- Game Logic JavaScript -->
-  <script>
-    let valveSequence = [];
-    const correctSequence = ["blue", "red", "yellow"];
-    let waterDrained = false;
-    let hasKeycard = false;
-    let cardSwiped = false;
-    let keypadInput = "";
-    const correctCode = "427";
-    let gameWon = false;
+  hasKey = true;
+  key.setAttribute("visible", false);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const waterEl = document.getElementById("water");
-      const keycardEl = document.getElementById("keycard");
-      const cardSlotEl = document.getElementById("cardSlot");
-      const cardLightEl = document.getElementById("cardLight");
-      const keypadDisplay = document.getElementById("keypadDisplay");
-      const doorLeft = document.getElementById("doorLeft");
-      const doorRight = document.getElementById("doorRight");
+  alert("You found the key!");
 
-      const hudGoal = document.getElementById("hud-goal");
-      const hudItem = document.getElementById("hud-item");
-      const hudStatus = document.getElementById("hud-status");
+});
 
-      function handleValveClick(color) {
-        if (waterDrained) return;
-        const currentExpected = correctSequence[valveSequence.length];
+// PUZZLE 2: OPEN BOX
+box.addEventListener("click", function() {
 
-        if (color === currentExpected) {
-          valveSequence.push(color);
-          hudStatus.innerText = `Correct valve! (${valveSequence.length}/3)`;
+  if (hasKey == true) {
 
-          if (valveSequence.length === 3) {
-            waterDrained = true;
-            hudStatus.innerText = "Water drained completely!";
-            hudGoal.innerText = "Pick up the glowing keycard from the pedestal.";
-            waterEl.setAttribute("animation", "property: position; to: 0 -0.5 0; dur: 3500; easing: easeInOutQuad");
-          }
-        } else {
-          valveSequence = [];
-          hudStatus.innerText = "Wrong sequence! Valves reset. Start with BLUE.";
-        }
-      }
+    boxOpened = true;
+    box.setAttribute("color", "green");
 
-      document.getElementById("valveBlue").addEventListener("click", () => handleValveClick("blue"));
-      document.getElementById("valveRed").addEventListener("click", () => handleValveClick("red"));
-      document.getElementById("valveYellow").addEventListener("click", () => handleValveClick("yellow"));
+    alert("Box opened! The secret code is 2580.");
 
-      keycardEl.addEventListener("click", () => {
-        if (!waterDrained) {
-          hudStatus.innerText = "Water level is too high to reach keycard!";
-          return;
-        }
-        if (hasKeycard) return;
-        hasKeycard = true;
-        keycardEl.setAttribute("visible", "false");
-        hudItem.innerText = "Keycard";
-        hudStatus.innerText = "Keycard acquired!";
-        hudGoal.innerText = "Swipe keycard on the terminal next to the door.";
-      });
+  } else {
 
-      cardSlotEl.addEventListener("click", () => {
-        if (!hasKeycard) {
-          hudStatus.innerText = "Terminal Locked: Requires Keycard!";
-          return;
-        }
-        if (cardSwiped) return;
-        cardSwiped = true;
-        cardLightEl.setAttribute("color", "#00ff88");
-        cardLightEl.setAttribute("material", "emissive: #00ff88; emissiveIntensity: 0.8");
-        hudStatus.innerText = "Keycard accepted! Door Keypad Active.";
-        hudGoal.innerText = "Count wall crystals & enter code on Keypad.";
-      });
+    alert("You need to find the key first!");
 
-      document.querySelectorAll(".keypad-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          if (!cardSwiped || gameWon) return;
-          const val = btn.getAttribute("data-val");
+  }
 
-          if (val === "CLR") {
-            keypadInput = "";
-          } else if (val === "OK") {
-            if (keypadInput === correctCode) {
-              gameWon = true;
-              keypadDisplay.setAttribute("value", "OPEN");
-              hudStatus.innerText = "CODE CORRECT! VAULT OPENING!";
-              hudGoal.innerText = "ESCAPE COMPLETE!";
-              doorLeft.setAttribute("animation", "property: position; to: -2.8 2.5 -7.6; dur: 2500; easing: easeInOutQuad");
-              doorRight.setAttribute("animation", "property: position; to: 2.8 2.5 -7.6; dur: 2500; easing: easeInOutQuad");
-              setTimeout(() => { document.getElementById("win-overlay").style.display = "block"; }, 1200);
-            } else {
-              keypadDisplay.setAttribute("value", "ERR");
-              hudStatus.innerText = "Incorrect Code! Check crystal counts.";
-              setTimeout(() => { keypadInput = ""; keypadDisplay.setAttribute("value", "---"); }, 1200);
-            }
-            return;
-          } else {
-            if (keypadInput.length < 3) keypadInput += val;
-          }
-          keypadDisplay.setAttribute("value", keypadInput.padEnd(3, "-"));
-        });
-      });
-    });
-  </script>
+});
+
+// PUZZLE 3: UNLOCK EXIT
+door.addEventListener("click", function() {
+
+  if (boxOpened == true) {
+
+    let code = prompt("Enter the secret code:");
+
+    if (code == "2580") {
+
+      doorUnlocked = true;
+      door.setAttribute("color", "green");
+
+      alert("Congratulations! You escaped!");
+
+    } else {
+
+      alert("Wrong code! Try again.");
+
+    }
+
+  } else {
+
+    alert("Solve the box puzzle first!");
+
+  }
+
+});
+
+</script>
+
 </body>
 </html>
+
